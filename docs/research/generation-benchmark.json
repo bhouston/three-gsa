@@ -1,0 +1,89 @@
+{
+  "note": "Fresh sequential construction timing, after warmups, on physical AMD GCN5. Browser launched with vsync/frame caps disabled and software rasterization disabled. Each measurement counts one complete volume: page navigation, adapter/device initialization, pipeline construction, synchronized compute, completed GPU readback and base64 transfer. No frame-time claim. GSA3000 and FAST10000 are different settings/quality points, not equal-quality optimization budgets. No intentional CPU analysis or other GPU work ran concurrently.",
+  "runs": [
+    {
+      "seed": 9,
+      "steps": 1000,
+      "name": "warmup-fast",
+      "milliseconds": 6510.3551,
+      "log": "mode=separate steps=1000 size=128x128x32 taps=200 fs=6\nstep 0 swaps/iter 5201 suppression 4 0.8s\nstep 100 swaps/iter 3515 suppression 2 1.4s\nstep 200 swaps/iter 3898 suppression 1 2.0s\nstep 300 swaps/iter 4572 suppression 1 2.7s\nstep 400 swaps/iter 3018 suppression 1 3.3s\nstep 500 swaps/iter 2278 suppression 1 3.9s\nstep 600 swaps/iter 1843 suppression 1 4.5s\nstep 700 swaps/iter 1549 suppression 1 5.1s\nstep 800 swaps/iter 1337 suppression 1 5.7s\nstep 900 swaps/iter 1185 suppression 1 6.3s\ndone in 6.3s on amd gcn-5\n"
+    },
+    {
+      "swapFloor": 2,
+      "stratified": true,
+      "name": "warmup-gsa",
+      "mixedWeight": 0.2,
+      "annealTemperature": 0.001,
+      "steps": 300,
+      "annealSteps": 1500,
+      "identityWeight": 0.25,
+      "seed": 9,
+      "milliseconds": 3341.8071,
+      "log": "mode=separate steps=300 size=128x128x32 taps=296 fs=6\nstep 0 swaps/iter 6142 suppression 4 1.1s\ndone in 3.2s on amd gcn-5\n"
+    },
+    {
+      "seed": 1,
+      "steps": 10000,
+      "name": "fast-seed1",
+      "milliseconds": 61232.739,
+      "log": "mode=separate steps=10000 size=128x128x32 taps=200 fs=6\nstep 0 swaps/iter 5205 suppression 4 0.7s\nstep 1000 swaps/iter 1061 suppression 1 6.8s\nstep 2000 swaps/iter 573 suppression 1 12.9s\nstep 3000 swaps/iter 445 suppression 1 19.0s\nstep 4000 swaps/iter 398 suppression 1 25.1s\nstep 5000 swaps/iter 357 suppression 1 31.2s\nstep 6000 swaps/iter 344 suppression 1 37.3s\nstep 7000 swaps/iter 327 suppression 1 43.4s\nstep 8000 swaps/iter 304 suppression 1 49.4s\nstep 9000 swaps/iter 288 suppression 1 55.5s\ndone in 61.0s on amd gcn-5\n",
+      "sha256": "ad64707c4d4551ac6eacd4ce7c732e48d1ca5b83e3fc2c9cdc678fe5b5983df9"
+    },
+    {
+      "swapFloor": 2,
+      "stratified": true,
+      "name": "gsa-seed1",
+      "mixedWeight": 0.2,
+      "annealTemperature": 0.001,
+      "steps": 3000,
+      "annealSteps": 1500,
+      "identityWeight": 0.25,
+      "seed": 1,
+      "milliseconds": 30720.21519999999,
+      "log": "mode=separate steps=3000 size=128x128x32 taps=296 fs=6\nstep 0 swaps/iter 6159 suppression 4 1.1s\nstep 300 swaps/iter 8145 suppression 1 4.1s\nstep 600 swaps/iter 6067 suppression 1 7.2s\nstep 900 swaps/iter 4173 suppression 1 10.2s\nstep 1200 swaps/iter 2180 suppression 1 13.3s\nstep 1500 swaps/iter 175 suppression 1 16.3s\nstep 1800 swaps/iter 13 suppression 1 19.4s\nstep 2100 swaps/iter 1 suppression 1 22.4s\nstep 2400 swaps/iter 0 suppression 1 25.4s\nstep 2700 swaps/iter 0 suppression 1 28.5s\ndone in 30.5s on amd gcn-5\n",
+      "sha256": "9599fa11b7475f6a7442d6f1db3d187ff62ab83422e6812f33f98dc9b42a0270"
+    },
+    {
+      "seed": 2,
+      "steps": 10000,
+      "name": "fast-seed2",
+      "milliseconds": 61338.5993,
+      "log": "mode=separate steps=10000 size=128x128x32 taps=200 fs=6\nstep 0 swaps/iter 5209 suppression 4 0.8s\nstep 1000 swaps/iter 1057 suppression 1 6.9s\nstep 2000 swaps/iter 571 suppression 1 13.0s\nstep 3000 swaps/iter 444 suppression 1 19.1s\nstep 4000 swaps/iter 384 suppression 1 25.2s\nstep 5000 swaps/iter 351 suppression 1 31.3s\nstep 6000 swaps/iter 331 suppression 1 37.4s\nstep 7000 swaps/iter 318 suppression 1 43.5s\nstep 8000 swaps/iter 316 suppression 1 49.6s\nstep 9000 swaps/iter 293 suppression 1 55.7s\ndone in 61.2s on amd gcn-5\n",
+      "sha256": "c71a155de2239b39b12e1c089e8992e3b53197e6ec971c1ce90c9ab8fac0ae95"
+    },
+    {
+      "swapFloor": 2,
+      "stratified": true,
+      "name": "gsa-seed2",
+      "mixedWeight": 0.2,
+      "annealTemperature": 0.001,
+      "steps": 3000,
+      "annealSteps": 1500,
+      "identityWeight": 0.25,
+      "seed": 2,
+      "milliseconds": 30756.13679999998,
+      "log": "mode=separate steps=3000 size=128x128x32 taps=296 fs=6\nstep 0 swaps/iter 6157 suppression 4 1.1s\nstep 300 swaps/iter 8142 suppression 1 4.2s\nstep 600 swaps/iter 6100 suppression 1 7.3s\nstep 900 swaps/iter 4171 suppression 1 10.3s\nstep 1200 swaps/iter 2177 suppression 1 13.4s\nstep 1500 swaps/iter 175 suppression 1 16.4s\nstep 1800 swaps/iter 14 suppression 1 19.4s\nstep 2100 swaps/iter 1 suppression 1 22.5s\nstep 2400 swaps/iter 0 suppression 1 25.5s\nstep 2700 swaps/iter 0 suppression 1 28.5s\ndone in 30.6s on amd gcn-5\n",
+      "sha256": "999e36cca419724258c3855669142b950a68827084956f9a6ae96a070300c3b1"
+    }
+  ],
+  "gpu": {
+    "vendor": "amd",
+    "architecture": "gcn-5",
+    "fallback": false
+  },
+  "referenceCommit": "bf8053703d208df3354256733d63c0506ef71c0f",
+  "pairs": [
+    {
+      "seed": 1,
+      "fastSeconds": 61.232739,
+      "gsaSeconds": 30.72021519999999,
+      "speedup": 1.9932392595999788
+    },
+    {
+      "seed": 2,
+      "fastSeconds": 61.3385993,
+      "gsaSeconds": 30.75613679999998,
+      "speedup": 1.9943531822241096
+    }
+  ]
+}
