@@ -26,10 +26,10 @@ def blur(pixels):
 
 truth = load('reference', 4096)
 half = load('reference', 2048)
-report = {'reference': {}, 'metrics': [], 'note': 'Floor ROI is bottom half in GPU readback coordinates; SSR reflection output only, static unoccluded camera, independent PCG reference.'}
+report = {'reference': {}, 'metrics': [], 'note': 'Lower-half image ROI is rows 64 through 127 in WebGPU readback coordinates; SSR reflection output only, static scene and camera, independent PCG reference.'}
 for filter_name, transform in [('raw', lambda x: x), ('binomial3', blur)]:
     target = transform(truth)
-    for region, roi in [('all', np.s_[:, :, :]), ('floor-half', np.s_[:64, :, :])]:
+    for region, roi in [('all', np.s_[:, :, :]), ('lower-half', np.s_[64:, :, :])]:
         key = f'{filter_name}/{region}'
         rmse = lambda image: float(np.sqrt(np.mean((image[roi] - target[roi]) ** 2)))
         report['reference'][key] = {'half_to_full_rmse': rmse(transform(half)), 'mean_reference': float(target[roi].mean())}

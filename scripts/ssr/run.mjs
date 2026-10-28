@@ -16,7 +16,7 @@ const local = fileURLToPath(new URL('./', import.meta.url));
 fs.mkdirSync(output, { recursive: true });
 const puppeteer = createRequire(path.join(checkout, 'package.json'))('puppeteer');
 const protocol = JSON.parse(fs.readFileSync(new URL('../../docs/research/ssr-protocol.json', import.meta.url), 'utf8'));
-const report = { protocol, inputs: {}, errors: [], complete: false };
+const report = { protocol, ssrSourceSha256: crypto.createHash('sha256').update(fs.readFileSync(path.join(checkout, 'examples/jsm/tsl/display/SSRNode.js'))).digest('hex'), inputs: {}, errors: [], complete: false };
 for (const method of ['fast', 'gsa']) for (let seed = 1; seed <= 4; seed++) {
   const name = `${method.toUpperCase()}-${seed}.f32`;
   report.inputs[name] = crypto.createHash('sha256').update(fs.readFileSync(path.join(inputs, name))).digest('hex');
