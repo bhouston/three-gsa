@@ -77,10 +77,17 @@ try {
       console.log(`Finished phase-extension ${method}`);
     }
   } else {
+  report.sampleLifecycle = {};
   for (const method of ['reference', 'fast', 'gsa']) {
     if (method !== 'reference') await page.evaluate(urls => window.ssrBench.setMasks(urls), Array.from({ length: 4 }, (_, i) => `/inputs/${method.toUpperCase()}-${i + 1}.f32`));
     console.log(`Starting ${method}`);
+    const before = await page.evaluate(() => ({ ...window.ssrBench.lifecycle }));
     const snapshots = await guard(page.evaluate((name, n) => window.ssrBench.run(name, n), method, method === 'reference' ? 4096 : 128));
+    const after = await page.evaluate(() => ({ ...window.ssrBench.lifecycle }));
+    const counts = Object.fromEntries(Object.keys(before).map(key => [key, after[key] - before[key]]));
+    const expected = method === 'reference' ? 4096 : 128;
+    if (Object.values(counts).some(value => value !== expected)) throw new Error(`Wrong actual sample count for ${method}`);
+    report.sampleLifecycle[method] = counts;
     for (const [count, pixels] of Object.entries(snapshots)) {
       const array = Float32Array.from(pixels);
       if (!array.every(Number.isFinite)) throw new Error(`Nonfinite ${method} ${count}`);
@@ -101,6 +108,8 @@ try {
   }
   }
   if (report.errors.length) throw new Error(`Browser reported ${report.errors.length} errors`);
+  report.lifecycle = await page.evaluate(() => window.ssrBench.lifecycle);
+  if (report.lifecycle.requestedSamples !== report.lifecycle.completedSSRUpdates || report.lifecycle.requestedSamples !== report.lifecycle.exactFrameAdvances) throw new Error('SSR lifecycle counters disagree');
   report.complete = true;
 } finally {
   fs.writeFileSync(path.join(output, phasesOnly ? 'ssr-phases-run.json' : 'ssr-run.json'), JSON.stringify(report, null, 2) + '\n');

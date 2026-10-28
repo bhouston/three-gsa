@@ -1,5 +1,6 @@
 """Preserve the initial diagnostic and analyze its predeclared 32-phase extension."""
 import json
+import hashlib
 import pathlib
 import sys
 import numpy as np
@@ -7,6 +8,10 @@ import numpy as np
 root = pathlib.Path(sys.argv[1])
 size = 128
 truth = np.fromfile(root / 'reference-4096.f32', dtype='<f4').reshape(size, size, 3).astype(np.float64)
+phase_run = json.loads((root / 'ssr-phases-run.json').read_text())
+reference_hash = hashlib.sha256((root / 'reference-4096.f32').read_bytes()).hexdigest()
+if phase_run['referenceSha256'] != reference_hash:
+    raise ValueError('Reference changed since the phase extension')
 
 
 def blur(pixels):
@@ -20,6 +25,7 @@ def blur(pixels):
 
 prefixes = [1, 4, 16, 32, 64, 128]
 errors = {}
+reproduction = []
 for method in ['fast', 'gsa']:
     frames = np.fromfile(root / f'{method}-frames-0-158.f32', dtype='<f4').reshape(159, size, size, 3)
     if not np.isfinite(frames).all() or not np.any(frames):
@@ -28,6 +34,7 @@ for method in ['fast', 'gsa']:
     for n in prefixes:
         phase_zero = sums[n] / n
         old = np.fromfile(root / f'{method}-{n}.f32', dtype='<f4').reshape(size, size, 3)
+        reproduction.append({'method': method, 'frames': n, 'max_absolute_difference': float(np.max(np.abs(phase_zero - old)))})
         if not np.allclose(phase_zero, old, atol=2e-7, rtol=0):
             raise ValueError(f'{method} frame capture did not reproduce phase-zero {n}-frame image: {np.max(np.abs(phase_zero-old))}')
         for phase in range(32):
@@ -37,7 +44,7 @@ for method in ['fast', 'gsa']:
                 for region, roi in [('all', np.s_[:, :, :]), ('lower-half', np.s_[64:, :, :])]:
                     errors.setdefault((filter_name, region, n), {}).setdefault(method, []).append(float(np.mean(delta[roi] ** 2)))
 
-report = {'description': 'Post-primary phase-coverage extension, frozen before its results; original 24 phase-zero metrics remain in ssr-metrics.json.', 'starting_phases': 32, 'metrics': []}
+report = {'description': 'Post-primary phase-coverage extension, frozen before its results; original 24 phase-zero metrics remain in ssr-metrics.json.', 'starting_phases': 32, 'reference_sha256': reference_hash, 'phase_zero_reproduction_tolerance': 2e-7, 'phase_zero_reproduction': reproduction, 'metrics': []}
 for (filter_name, region, frames), methods in errors.items():
     fast = np.sqrt(methods['fast'])
     gsa = np.sqrt(methods['gsa'])

@@ -49,16 +49,23 @@ const pipeline = new THREE.RenderPipeline(renderer);
 pipeline.outputNode = reflection.rgb;
 const prefixes = [1, 4, 16, 32, 64, 128];
 const convert = values => values instanceof Float32Array ? values : Float32Array.from(values, value => THREE.DataUtils.fromHalfFloat(value));
+const lifecycle = { requestedSamples: 0, completedSSRUpdates: 0, exactFrameAdvances: 0 };
 const renderSample = frame => {
   // RenderPipeline.render() does not advance the FRAME-scoped node lifecycle.
   // Every manually submitted sample must update both scene PassNode and SSRNode.
+  const previousFrame = renderer._nodes.nodeFrame.frameId;
   renderer._nodes.nodeFrame.update();
+  lifecycle.requestedSamples++;
   reflection._noiseIndex.value = frame - 1;
   pipeline.render();
   if (reflection._noiseIndex.value !== frame) throw new Error(`SSR did not update for sample ${frame}`);
+  lifecycle.completedSSRUpdates++;
+  if (renderer._nodes.nodeFrame.frameId !== previousFrame + 1) throw new Error(`NodeFrame did not advance exactly once for sample ${frame}`);
+  lifecycle.exactFrameAdvances++;
 };
 window.ssrBench = {
   renderer,
+  lifecycle,
   async setMasks(urls) {
     for (let i = 0; i < 4; i++) {
       const response = await fetch(urls[i]);
