@@ -3,6 +3,7 @@
   "frozenBeforeResults": true,
   "purpose": "Actual stochastic Three.js SSRNode convergence against an independent converged SSR reference; not physically unbiased path tracing ground truth.",
   "resolution": [128, 128],
+  "manualFrameLifecycle": "Explicitly advance renderer._nodes.nodeFrame before each manual RenderPipeline.render(), then assert SSRNode advanced its noise index exactly to the requested frame. FRAME-scoped SSR and scene passes must run for every counted sample.",
   "scene": "Three adjacent metallic floor strips with roughness 0.12, 0.3 and 0.65; three emissive-color boxes; fixed perspective camera and static geometry.",
   "dimensions": "Four independently generated scalar volumes, seeds 1 through 4, used for Xi.x, Xi.y, ray-march jitter and Xi.w respectively. All values quantized to 8-bit bin centers. Same addressing and 32-frame cycle shift (37,71).",
   "ssr": {"stochastic": true, "mirrorBias": 0, "envImportanceSampling": false, "quality": 0.5, "maxDistance": 10, "thickness": 0.08},

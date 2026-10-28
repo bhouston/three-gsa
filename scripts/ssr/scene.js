@@ -49,6 +49,14 @@ const pipeline = new THREE.RenderPipeline(renderer);
 pipeline.outputNode = reflection.rgb;
 const prefixes = [1, 4, 16, 32, 64, 128];
 const convert = values => values instanceof Float32Array ? values : Float32Array.from(values, value => THREE.DataUtils.fromHalfFloat(value));
+const renderSample = frame => {
+  // RenderPipeline.render() does not advance the FRAME-scoped node lifecycle.
+  // Every manually submitted sample must update both scene PassNode and SSRNode.
+  renderer._nodes.nodeFrame.update();
+  reflection._noiseIndex.value = frame - 1;
+  pipeline.render();
+  if (reflection._noiseIndex.value !== frame) throw new Error(`SSR did not update for sample ${frame}`);
+};
 window.ssrBench = {
   renderer,
   async setMasks(urls) {
@@ -66,9 +74,7 @@ window.ssrBench = {
     const sum = new Float64Array(size * size * 3);
     const snapshots = {};
     for (let frame = 0; frame < count; frame++) {
-      // SSRNode advances the index during its update; compensate to make frame zero explicit.
-      reflection._noiseIndex.value = frame - 1;
-      pipeline.render();
+      renderSample(frame);
       const pixels = convert(await renderer.readRenderTargetPixelsAsync(reflection._ssrRenderTarget, 0, 0, size, size));
       for (let p = 0; p < size * size; p++) for (let c = 0; c < 3; c++) sum[p * 3 + c] += pixels[p * 4 + c];
       const n = frame + 1;
@@ -82,8 +88,7 @@ window.ssrBench = {
     window.ssrNoise.mode.value = 1;
     const frames = new Float32Array(count * size * size * 3);
     for (let offset = 0; offset < count; offset++) {
-      reflection._noiseIndex.value = start + offset - 1;
-      pipeline.render();
+      renderSample(start + offset);
       const pixels = convert(await renderer.readRenderTargetPixelsAsync(reflection._ssrRenderTarget, 0, 0, size, size));
       const target = offset * size * size * 3;
       for (let p = 0; p < size * size; p++) for (let c = 0; c < 3; c++) frames[target + p * 3 + c] = pixels[p * 4 + c];
@@ -97,12 +102,13 @@ window.ssrBench = {
   async throughput(warmupMilliseconds = 1000, measuredMilliseconds = 3000) {
     window.ssrNoise.mode.value = 1;
     const queue = renderer.backend.device.queue;
+    let frame = 0;
     const windowFor = async milliseconds => {
       await queue.onSubmittedWorkDone();
       const start = performance.now();
       let completedFrames = 0;
       do {
-        for (let i = 0; i < 16; i++) pipeline.render();
+        for (let i = 0; i < 16; i++) renderSample(frame++);
         await queue.onSubmittedWorkDone();
         completedFrames += 16;
       } while (performance.now() - start < milliseconds);
