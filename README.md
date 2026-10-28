@@ -10,6 +10,8 @@ Separate, with measured regressions on others. It is not a claim of a universall
 better blue-noise sampler or a new state of the art. See [the research report](docs/research/README.md)
 for the benchmark, provenance, timings and tradeoffs.
 
+![Standalone example on a physical AMD GPU: white noise left, GSA right](docs/research/standalone-example.png)
+
 ## Run the example
 
 Requires Node.js 22+ and pnpm 11. The packages are source code in this repository;
