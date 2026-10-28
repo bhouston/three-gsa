@@ -104,6 +104,18 @@ before GPU access and the committed PNG's hash and temporal stratification.
 Browser GPU validation requires a physical GPU; software adapters are not accepted
 as rendering-quality evidence.
 
+```powershell
+node scripts/verify-gpu.mjs ../three.js ../gpu-check-results
+```
+
+This optional check reuses an existing Three.js checkout's Puppeteer installation
+and installed Chrome (`CHROME_PATH` can override the executable). It starts and
+stops its own local Vite server and browser. It validates actual WebGL2 PNG and
+DataTexture playback, TSL/WebGPU readback, mid-generation cancellation, controls,
+and the complete default generation against the evaluated mask's SHA-256 hashes.
+The recorded reference hash was reproduced on AMD GCN 5/D3D11; floating-point GPU
+optimization is not promised to be byte-identical across different adapters.
+
 ## Origins and license
 
 This variant was found through AI-assisted exploration and evaluation during the

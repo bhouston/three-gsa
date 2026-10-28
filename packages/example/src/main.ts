@@ -17,6 +17,7 @@ let atlas: THREE.Texture | undefined;
 let samples = 0, frame = 0, ready = false;
 let targets: THREE.WebGLRenderTarget[] = [];
 let compute: THREE.RawShaderMaterial, display: THREE.RawShaderMaterial;
+let renderSample: () => void = () => {};
 
 const vertexShader = /* glsl */`
 in vec3 position; out vec2 vUv;
@@ -46,7 +47,8 @@ uniform sampler2D history, atlas; uniform int frame, count, sphere, spatial, tem
 ${gsaSamplingGLSL}
 uint hash(uint x) { x ^= x >> 16u; x *= 0x7feb352du; x ^= x >> 15u; x *= 0x846ca68bu; return x ^ (x >> 16u); }
 float sampleField(ivec2 p, bool right) {
-  float u = right ? sampleGSA(atlas, p, frame, 128, 32) : (float(hash(uint(p.x) + uint(p.y)*65537u + uint(frame)*196613u)) + 0.5) / 4294967296.0;
+  uint whiteSeed = hash(uint(p.x)) ^ hash(uint(p.y) ^ 0x9e3779b9u) ^ hash(uint(frame) ^ 0x85ebca6bu);
+  float u = right ? sampleGSA(atlas, p, frame, 128, 32) : (float(hash(whiteSeed)) + 0.5) / 4294967296.0;
   if (sphere == 0) return u;
   vec2 uv = (vec2(p - ivec2(512)) + 0.5) / 512.0 * 2.0 - 1.0;
   float coverage = sqrt(max(0.0, 1.0 - dot(uv, uv) / 0.8));
@@ -69,7 +71,7 @@ void main() { vec3 linear = texture(image, vUv).rgb; vec3 srgb = mix(linear * 12
 `, uniforms: { image: { value: targets[1].texture } } });
   ready = true;
   status.textContent = 'Precomputed GSA loaded. White and GSA use identical accumulation and filtering.';
-  renderer.setAnimationLoop(() => {
+  renderSample = () => {
     if (!ready || (!animate.checked && samples > 0)) return;
     const [previous, current] = targets;
     compute.uniforms.history.value = previous.texture;
@@ -82,7 +84,8 @@ void main() { vec3 linear = texture(image, vUv).rgb; vec3 srgb = mix(linear * 12
     mesh.material = display; renderer!.setRenderTarget(null); renderer!.render(scene, camera);
     targets.reverse(); samples++; frame++;
     element('frames').textContent = String(temporal.checked ? samples : 1);
-  });
+  };
+  renderer.setAnimationLoop(renderSample);
 }
 
 generateButton.addEventListener('click', async () => {

@@ -1,3 +1,4 @@
+/// <reference types="@webgpu/types" preserve="true" />
 import { validateDimensions } from './index.js';
 import type { GSAVolume } from './index.js';
 import { createKernel } from './kernel.js';
