@@ -66,6 +66,15 @@ try {
     await page.screenshot({ path: path.join(output, `${method}.png`) });
     console.log(`Finished ${method}`);
   }
+  report.throughput = [];
+  for (const [order, methods] of [['fast-then-gsa', ['fast', 'gsa']], ['gsa-then-fast', ['gsa', 'fast']]]) {
+    for (const method of methods) {
+      await page.evaluate(urls => window.ssrBench.setMasks(urls), Array.from({ length: 4 }, (_, i) => `/inputs/${method.toUpperCase()}-${i + 1}.f32`));
+      const measurement = await page.evaluate(() => window.ssrBench.throughput());
+      report.throughput.push({ order, method, ...measurement });
+      console.log(JSON.stringify({ order, method, ...measurement }));
+    }
+  }
   if (report.errors.length) throw new Error(`Browser reported ${report.errors.length} errors`);
   report.complete = true;
 } finally {

@@ -78,5 +78,23 @@ window.ssrBench = {
     await renderer.backend.device.queue.onSubmittedWorkDone();
     return snapshots;
   },
+  async throughput(warmupMilliseconds = 1000, measuredMilliseconds = 3000) {
+    window.ssrNoise.mode.value = 1;
+    const queue = renderer.backend.device.queue;
+    const windowFor = async milliseconds => {
+      await queue.onSubmittedWorkDone();
+      const start = performance.now();
+      let completedFrames = 0;
+      do {
+        for (let i = 0; i < 16; i++) pipeline.render();
+        await queue.onSubmittedWorkDone();
+        completedFrames += 16;
+      } while (performance.now() - start < milliseconds);
+      return { completedFrames, elapsedSeconds: (performance.now() - start) / 1000 };
+    };
+    const warmup = await windowFor(warmupMilliseconds);
+    const measured = await windowFor(measuredMilliseconds);
+    return { warmup, measured, framesPerSecond: measured.completedFrames / measured.elapsedSeconds };
+  },
 };
 window.ssrReady = true;

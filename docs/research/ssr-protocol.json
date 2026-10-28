@@ -8,6 +8,7 @@
   "ssr": {"stochastic": true, "mirrorBias": 0, "envImportanceSampling": false, "quality": 0.5, "maxDistance": 10, "thickness": 0.08},
   "prefixes": [1, 4, 16, 32, 64, 128],
   "reference": {"generator": "Three.js PCG integer hash with independent frame, pixel and dimension keys; no candidate masks", "samples": 4096, "convergenceComparison": [2048, 4096]},
+  "throughput": "Actual scene rendering at 128x128, no GPU readback; each FAST/GSA measurement has at least one second warmup followed by at least three measured seconds, 16-frame GPU-completed batches, drained queues before switching, both method orders. Vsync and frame caps disabled. Not a claim of interactive high-resolution FPS.",
   "metrics": "RGB RMSE of temporally averaged SSR output, all pixels and fixed lower-half image ROI (WebGPU rows 64 through 127, foreground floor), raw and identical 3x3 binomial filtered candidate and reference. Report reference half-to-full RMSE separately.",
   "limitations": "Static scene only; no environment MIS, recurrent denoiser or production motion integration. Four seed dimensions form one evaluated sampler instance, not independent confidence trials."
 }
