@@ -1,0 +1,42 @@
+{
+  "source": "bhouston/three.js",
+  "commit": "bf8053703d208df3354256733d63c0506ef71c0f",
+  "frames": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    8,
+    12,
+    16,
+    24,
+    32,
+    48,
+    64,
+    96,
+    128
+  ],
+  "viewport": [
+    960,
+    600
+  ],
+  "pixelSize": 2,
+  "mode": "Sphere",
+  "spatialBlur": "Gaussian sigma=1",
+  "temporalBlur": "running average",
+  "note": "Canvas readback of actual GPU rendering. Accelerated sample-count demonstration, not a frame-rate benchmark.",
+  "errors": [],
+  "adapter": {
+    "vendor": "amd",
+    "architecture": "gcn-5",
+    "fallback": false
+  },
+  "renderer": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11-31.0.12027.9001)",
+  "requestedAdapter": {
+    "vendor": "amd",
+    "architecture": "gcn-5",
+    "fallback": false
+  },
+  "pass": true
+}

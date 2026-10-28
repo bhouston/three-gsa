@@ -1,0 +1,23 @@
+{
+  "layout": "128x4096 scalar R, z/y/x; floor(value*256); decode as (byte+.5)/256; seed 1",
+  "profiles": [
+    {
+      "name": "gpu-stratified-annealed",
+      "gpu": {
+        "steps": 3000,
+        "stratified": true,
+        "swapFloor": 2,
+        "identityWeight": 0.25,
+        "mixedWeight": 0.2,
+        "annealTemperature": 0.001,
+        "annealSteps": 1500
+      },
+      "seed": 1,
+      "floatSHA256": "9599fa11b7475f6a7442d6f1db3d187ff62ab83422e6812f33f98dc9b42a0270",
+      "quantizedSHA256": "f335d55f6e719d55313080225f7627a4aa684aded481608da2bb72b3e3fc627c",
+      "pngSHA256": "cf538357aff97550a45f74f7c30b8a10a8fc4c2cd78d723cf18f4f39bee74ad5",
+      "bytes": 528557
+    }
+  ],
+  "source": "https://github.com/bhouston/three.js/pull/116"
+}

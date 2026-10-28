@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>GSA scalar noise comparison</title></head>
+<body>
+  <main>
+    <h1>GPU Stratified Annealing</h1>
+    <p>One scalar sample per pixel per frame, shown as sphere visibility. Both sides receive the same spatial and temporal filtering.</p>
+    <div class="controls">
+      <label>Display <select id="mode"><option value="sphere">Sphere visibility</option><option value="uniform">Scalar field (mean 0.5)</option></select></label>
+      <label><input id="spatial" type="checkbox" checked> 3×3 spatial blur</label>
+      <label><input id="temporal" type="checkbox" checked> Temporal average</label>
+      <label><input id="animate" type="checkbox" checked> Animate</label>
+      <button id="reset">Reset</button>
+      <span>Frames: <output id="frames">0</output></span>
+    </div>
+    <div class="labels"><strong>White noise</strong><strong>GSA</strong></div>
+    <canvas id="comparison" aria-label="Side by side white noise and GSA accumulated visibility"></canvas>
+    <p id="status" role="status">Loading precomputed GSA atlas…</p>
+    <div class="controls"><button id="generate">Generate a new GSA mask on this GPU</button><button id="cancel" disabled>Cancel generation</button></div>
+    <p>Default: precomputed 128×128×32 mask, seed 1, 3000 optimizer iterations. Generation is optional, requires hardware WebGPU, and normally takes tens of seconds. Rendering uses WebGL2. This is a scalar sampler, not a general multidimensional path tracing sampler.</p>
+    <p><a href="https://github.com/bhouston/three-gsa">Source, algorithm and measured tradeoffs</a></p>
+  </main>
+  <script type="module" src="/src/main.ts"></script>
+</body></html>

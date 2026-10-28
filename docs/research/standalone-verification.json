@@ -1,0 +1,176 @@
+{
+  "errors": [],
+  "checks": [
+    "Default 3000-step generation exactly reproduces evaluated float and quantized hashes.",
+    "WebGL2 PNG, generated DataTexture and CPU sample helper agree at frames 0, 31 and 32.",
+    "TSL helper renders on physical WebGPU and matches CPU samples at frames 0, 31 and 32.",
+    "Cancellation after 100 iterations releases resources and preserves a caller-owned GPU device.",
+    "Reset, mode dropdown and spatial filter controls reset accumulation."
+  ],
+  "pass": true,
+  "renderer": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11-31.0.12027.9001)",
+  "adapter": {
+    "vendor": "amd",
+    "architecture": "gcn-5",
+    "fallback": false
+  },
+  "generation": {
+    "floatSHA256": "9599fa11b7475f6a7442d6f1db3d187ff62ab83422e6812f33f98dc9b42a0270",
+    "quantizedSHA256": "f335d55f6e719d55313080225f7627a4aa684aded481608da2bb72b3e3fc627c",
+    "elapsedMs": 30615.099999904633,
+    "progress": [
+      0,
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900,
+      1000,
+      1100,
+      1200,
+      1300,
+      1400,
+      1500,
+      1600,
+      1700,
+      1800,
+      1900,
+      2000,
+      2100,
+      2200,
+      2300,
+      2400,
+      2500,
+      2600,
+      2700,
+      2800,
+      2900,
+      3000
+    ]
+  },
+  "playback": [
+    {
+      "frame": 0,
+      "samples": [
+        {
+          "x": 0,
+          "y": 0,
+          "value": 0.568359375
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "value": 0.666015625
+        },
+        {
+          "x": 37,
+          "y": 71,
+          "value": 0.654296875
+        },
+        {
+          "x": 127,
+          "y": 127,
+          "value": 0.837890625
+        },
+        {
+          "x": 128,
+          "y": 128,
+          "value": 0.568359375
+        },
+        {
+          "x": 511,
+          "y": 511,
+          "value": 0.837890625
+        }
+      ]
+    },
+    {
+      "frame": 31,
+      "samples": [
+        {
+          "x": 0,
+          "y": 0,
+          "value": 0.025390625
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "value": 0.251953125
+        },
+        {
+          "x": 37,
+          "y": 71,
+          "value": 0.220703125
+        },
+        {
+          "x": 127,
+          "y": 127,
+          "value": 0.197265625
+        },
+        {
+          "x": 128,
+          "y": 128,
+          "value": 0.025390625
+        },
+        {
+          "x": 511,
+          "y": 511,
+          "value": 0.197265625
+        }
+      ]
+    },
+    {
+      "frame": 32,
+      "samples": [
+        {
+          "x": 0,
+          "y": 0,
+          "value": 0.654296875
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "value": 0.798828125
+        },
+        {
+          "x": 37,
+          "y": 71,
+          "value": 0.462890625
+        },
+        {
+          "x": 127,
+          "y": 127,
+          "value": 0.166015625
+        },
+        {
+          "x": 128,
+          "y": 128,
+          "value": 0.654296875
+        },
+        {
+          "x": 511,
+          "y": 511,
+          "value": 0.166015625
+        }
+      ]
+    }
+  ],
+  "tsl": {
+    "backend": "WebGPU",
+    "frames": [
+      0,
+      31,
+      32
+    ],
+    "adapter": "amd"
+  },
+  "cancellation": {
+    "cancelled": true,
+    "completed": 100,
+    "callerDeviceRemainsUsable": true
+  }
+}

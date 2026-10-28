@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "frozenBeforeResults": true,
+  "purpose": "Actual stochastic Three.js SSRNode convergence against an independent converged SSR reference; not physically unbiased path tracing ground truth.",
+  "resolution": [128, 128],
+  "scene": "Three adjacent metallic floor strips with roughness 0.12, 0.3 and 0.65; three emissive-color boxes; fixed perspective camera and static geometry.",
+  "dimensions": "Four independently generated scalar volumes, seeds 1 through 4, used for Xi.x, Xi.y, ray-march jitter and Xi.w respectively. All values quantized to 8-bit bin centers. Same addressing and 32-frame cycle shift (37,71).",
+  "ssr": {"stochastic": true, "mirrorBias": 0, "envImportanceSampling": false, "quality": 0.5, "maxDistance": 10, "thickness": 0.08},
+  "prefixes": [1, 4, 16, 32, 64, 128],
+  "reference": {"generator": "Three.js PCG integer hash with independent frame, pixel and dimension keys; no candidate masks", "samples": 4096, "convergenceComparison": [2048, 4096]},
+  "metrics": "RGB RMSE of temporally averaged SSR output, all pixels and fixed lower-half image ROI (WebGPU rows 64 through 127, foreground floor), raw and identical 3x3 binomial filtered candidate and reference. Report reference half-to-full RMSE separately.",
+  "limitations": "Static scene only; no environment MIS, recurrent denoiser or production motion integration. Four seed dimensions form one evaluated sampler instance, not independent confidence trials."
+}
