@@ -3,11 +3,14 @@
   "frozenBeforeResults": true,
   "purpose": "Actual stochastic Three.js SSRNode convergence against an independent converged SSR reference; not physically unbiased path tracing ground truth.",
   "resolution": [128, 128],
+  "manualFrameLifecycle": "Explicitly advance renderer._nodes.nodeFrame before each manual RenderPipeline.render(), then assert SSRNode advanced its noise index exactly to the requested frame. FRAME-scoped SSR and scene passes must run for every counted sample.",
   "scene": "Three adjacent metallic floor strips with roughness 0.12, 0.3 and 0.65; three emissive-color boxes; fixed perspective camera and static geometry.",
   "dimensions": "Four independently generated scalar volumes, seeds 1 through 4, used for Xi.x, Xi.y, ray-march jitter and Xi.w respectively. All values quantized to 8-bit bin centers. Same addressing and 32-frame cycle shift (37,71).",
   "ssr": {"stochastic": true, "mirrorBias": 0, "envImportanceSampling": false, "quality": 0.5, "maxDistance": 10, "thickness": 0.08},
   "prefixes": [1, 4, 16, 32, 64, 128],
+  "phaseExtension": {"frozenBeforePhaseResults": true, "reason": "Initial phase-zero SSR findings prompted broader starting-window coverage, without tuning the sampler or scene.", "startingPhases": 32, "capturedFrames": [0, 158], "reference": "Reuse the original independent 4096-sample SSR reference", "aggregation": "Mean square error over all 32 phases before square root, plus each phase separately and min/max; preserve original 24 phase-zero metrics."},
   "reference": {"generator": "Three.js PCG integer hash with independent frame, pixel and dimension keys; no candidate masks", "samples": 4096, "convergenceComparison": [2048, 4096]},
+  "throughput": "Actual scene rendering at 128x128, no GPU readback; each FAST/GSA measurement has at least one second warmup followed by at least three measured seconds, 16-frame GPU-completed batches, drained queues before switching, both method orders. Vsync and frame caps disabled. Not a claim of interactive high-resolution FPS.",
   "metrics": "RGB RMSE of temporally averaged SSR output, all pixels and fixed lower-half image ROI (WebGPU rows 64 through 127, foreground floor), raw and identical 3x3 binomial filtered candidate and reference. Report reference half-to-full RMSE separately.",
   "limitations": "Static scene only; no environment MIS, recurrent denoiser or production motion integration. Four seed dimensions form one evaluated sampler instance, not independent confidence trials."
 }

@@ -41,3 +41,20 @@ report['improvements'] = sum(row['relative_change_percent'] < -1e-10 for row in 
 report['regressions'] = sum(row['relative_change_percent'] > 1e-10 for row in report['metrics'])
 (root / 'ssr-metrics.json').write_text(json.dumps(report, indent=2) + '\n')
 print(json.dumps({'improvements': report['improvements'], 'regressions': report['regressions'], 'reference': report['reference']}, indent=2))
+
+# Visualize GPU render-target readback, rather than relying on browser composition.
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(2, 3, figsize=(11, 7), constrained_layout=True)
+for row, frames in enumerate([4, 128]):
+    for col, name in enumerate(['reference', 'fast', 'gsa']):
+        linear = load(name, 4096 if name == 'reference' else frames) * 4
+        srgb = np.where(linear <= 0.0031308, 12.92 * linear, 1.055 * np.maximum(linear, 0) ** (1 / 2.4) - 0.055)
+        axes[row, col].imshow(np.clip(srgb, 0, 1), interpolation='nearest')
+        axes[row, col].set_title(f'{name.upper()}, {4096 if name == "reference" else frames} samples')
+        axes[row, col].axis('off')
+fig.suptitle('Actual Three.js stochastic SSR reflection output\nPhysical AMD GPU readback; 4x exposure for display')
+fig.savefig(root / 'ssr-readback.png', dpi=150)
+plt.close(fig)

@@ -49,8 +49,23 @@ const pipeline = new THREE.RenderPipeline(renderer);
 pipeline.outputNode = reflection.rgb;
 const prefixes = [1, 4, 16, 32, 64, 128];
 const convert = values => values instanceof Float32Array ? values : Float32Array.from(values, value => THREE.DataUtils.fromHalfFloat(value));
+const lifecycle = { requestedSamples: 0, completedSSRUpdates: 0, exactFrameAdvances: 0 };
+const renderSample = frame => {
+  // RenderPipeline.render() does not advance the FRAME-scoped node lifecycle.
+  // Every manually submitted sample must update both scene PassNode and SSRNode.
+  const previousFrame = renderer._nodes.nodeFrame.frameId;
+  renderer._nodes.nodeFrame.update();
+  lifecycle.requestedSamples++;
+  reflection._noiseIndex.value = frame - 1;
+  pipeline.render();
+  if (reflection._noiseIndex.value !== frame) throw new Error(`SSR did not update for sample ${frame}`);
+  lifecycle.completedSSRUpdates++;
+  if (renderer._nodes.nodeFrame.frameId !== previousFrame + 1) throw new Error(`NodeFrame did not advance exactly once for sample ${frame}`);
+  lifecycle.exactFrameAdvances++;
+};
 window.ssrBench = {
   renderer,
+  lifecycle,
   async setMasks(urls) {
     for (let i = 0; i < 4; i++) {
       const response = await fetch(urls[i]);
@@ -66,9 +81,7 @@ window.ssrBench = {
     const sum = new Float64Array(size * size * 3);
     const snapshots = {};
     for (let frame = 0; frame < count; frame++) {
-      // SSRNode advances the index during its update; compensate to make frame zero explicit.
-      reflection._noiseIndex.value = frame - 1;
-      pipeline.render();
+      renderSample(frame);
       const pixels = convert(await renderer.readRenderTargetPixelsAsync(reflection._ssrRenderTarget, 0, 0, size, size));
       for (let p = 0; p < size * size; p++) for (let c = 0; c < 3; c++) sum[p * 3 + c] += pixels[p * 4 + c];
       const n = frame + 1;
@@ -77,6 +90,40 @@ window.ssrBench = {
     }
     await renderer.backend.device.queue.onSubmittedWorkDone();
     return snapshots;
+  },
+  async captureFrames(start, count) {
+    window.ssrNoise.mode.value = 1;
+    const frames = new Float32Array(count * size * size * 3);
+    for (let offset = 0; offset < count; offset++) {
+      renderSample(start + offset);
+      const pixels = convert(await renderer.readRenderTargetPixelsAsync(reflection._ssrRenderTarget, 0, 0, size, size));
+      const target = offset * size * size * 3;
+      for (let p = 0; p < size * size; p++) for (let c = 0; c < 3; c++) frames[target + p * 3 + c] = pixels[p * 4 + c];
+    }
+    await renderer.backend.device.queue.onSubmittedWorkDone();
+    const bytes = new Uint8Array(frames.buffer);
+    const chunks = [];
+    for (let offset = 0; offset < bytes.length; offset += 8192) chunks.push(String.fromCharCode(...bytes.subarray(offset, offset + 8192)));
+    return btoa(chunks.join(''));
+  },
+  async throughput(warmupMilliseconds = 1000, measuredMilliseconds = 3000) {
+    window.ssrNoise.mode.value = 1;
+    const queue = renderer.backend.device.queue;
+    let frame = 0;
+    const windowFor = async milliseconds => {
+      await queue.onSubmittedWorkDone();
+      const start = performance.now();
+      let completedFrames = 0;
+      do {
+        for (let i = 0; i < 16; i++) renderSample(frame++);
+        await queue.onSubmittedWorkDone();
+        completedFrames += 16;
+      } while (performance.now() - start < milliseconds);
+      return { completedFrames, elapsedSeconds: (performance.now() - start) / 1000 };
+    };
+    const warmup = await windowFor(warmupMilliseconds);
+    const measured = await windowFor(measuredMilliseconds);
+    return { warmup, measured, framesPerSecond: measured.completedFrames / measured.elapsedSeconds };
   },
 };
 window.ssrReady = true;
