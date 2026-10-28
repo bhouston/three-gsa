@@ -78,6 +78,22 @@ window.ssrBench = {
     await renderer.backend.device.queue.onSubmittedWorkDone();
     return snapshots;
   },
+  async captureFrames(start, count) {
+    window.ssrNoise.mode.value = 1;
+    const frames = new Float32Array(count * size * size * 3);
+    for (let offset = 0; offset < count; offset++) {
+      reflection._noiseIndex.value = start + offset - 1;
+      pipeline.render();
+      const pixels = convert(await renderer.readRenderTargetPixelsAsync(reflection._ssrRenderTarget, 0, 0, size, size));
+      const target = offset * size * size * 3;
+      for (let p = 0; p < size * size; p++) for (let c = 0; c < 3; c++) frames[target + p * 3 + c] = pixels[p * 4 + c];
+    }
+    await renderer.backend.device.queue.onSubmittedWorkDone();
+    const bytes = new Uint8Array(frames.buffer);
+    const chunks = [];
+    for (let offset = 0; offset < bytes.length; offset += 8192) chunks.push(String.fromCharCode(...bytes.subarray(offset, offset + 8192)));
+    return btoa(chunks.join(''));
+  },
   async throughput(warmupMilliseconds = 1000, measuredMilliseconds = 3000) {
     window.ssrNoise.mode.value = 1;
     const queue = renderer.backend.device.queue;

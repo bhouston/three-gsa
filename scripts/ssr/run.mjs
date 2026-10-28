@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import crypto from 'node:crypto';
 
 const [checkoutArg, inputsArg, outputArg] = process.argv.slice(2);
+const phasesOnly = process.argv.includes('--phases-only');
 if (!outputArg) throw new Error('Usage: node scripts/ssr/run.mjs THREE_CHECKOUT INPUT_DIRECTORY OUTPUT_DIRECTORY');
 const checkout = path.resolve(checkoutArg);
 const inputs = path.resolve(inputsArg);
@@ -57,6 +58,25 @@ try {
   report.renderer = (await cdp.send('SystemInfo.getInfo')).gpu.auxAttributes.glRenderer;
   if (report.adapter.fallback !== false || !/AMD|NVIDIA|Intel/i.test(report.renderer) || /SwiftShader|llvmpipe|lavapipe|Microsoft Basic/i.test(report.renderer)) throw new Error('Physical GPU required');
   console.log(JSON.stringify({ adapter: report.adapter, renderer: report.renderer }));
+  if (phasesOnly) {
+    const previous = JSON.parse(fs.readFileSync(path.join(output, 'ssr-run.json'), 'utf8'));
+    if (!previous.complete || previous.ssrSourceSha256 !== report.ssrSourceSha256) throw new Error('Phase extension requires the successful original reference from the same SSR source');
+    if (fs.statSync(path.join(output, 'reference-4096.f32')).size !== 128 * 128 * 3 * 4) throw new Error('Reference dimensions differ');
+    report.referenceSha256 = crypto.createHash('sha256').update(fs.readFileSync(path.join(output, 'reference-4096.f32'))).digest('hex');
+    for (const method of ['fast', 'gsa']) {
+      await page.evaluate(urls => window.ssrBench.setMasks(urls), Array.from({ length: 4 }, (_, i) => `/inputs/${method.toUpperCase()}-${i + 1}.f32`));
+      const filename = path.join(output, `${method}-frames-0-158.f32`);
+      fs.writeFileSync(filename, Buffer.alloc(0));
+      for (let start = 0; start < 159; start += 16) {
+        const count = Math.min(16, 159 - start);
+        const encoded = await guard(page.evaluate((first, n) => window.ssrBench.captureFrames(first, n), start, count));
+        const bytes = Buffer.from(encoded, 'base64');
+        if (bytes.length !== count * 128 * 128 * 3 * 4) throw new Error('Wrong frame payload size');
+        fs.appendFileSync(filename, bytes);
+      }
+      console.log(`Finished phase-extension ${method}`);
+    }
+  } else {
   for (const method of ['reference', 'fast', 'gsa']) {
     if (method !== 'reference') await page.evaluate(urls => window.ssrBench.setMasks(urls), Array.from({ length: 4 }, (_, i) => `/inputs/${method.toUpperCase()}-${i + 1}.f32`));
     console.log(`Starting ${method}`);
@@ -79,10 +99,11 @@ try {
       console.log(JSON.stringify({ order, method, ...measurement }));
     }
   }
+  }
   if (report.errors.length) throw new Error(`Browser reported ${report.errors.length} errors`);
   report.complete = true;
 } finally {
-  fs.writeFileSync(path.join(output, 'ssr-run.json'), JSON.stringify(report, null, 2) + '\n');
+  fs.writeFileSync(path.join(output, phasesOnly ? 'ssr-phases-run.json' : 'ssr-run.json'), JSON.stringify(report, null, 2) + '\n');
   if (browser) await browser.close();
   await new Promise(resolve => server.close(resolve));
 }
