@@ -1,0 +1,7 @@
+{
+  "name": "gsa-example",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "vite --host 127.0.0.1", "build": "vite build", "typecheck": "tsc --noEmit -p tsconfig.json" },
+  "dependencies": { "three": "0.186.0", "three-gsa": "workspace:*" }
+}
