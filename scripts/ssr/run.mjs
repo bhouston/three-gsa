@@ -12,11 +12,11 @@ if (!outputArg) throw new Error('Usage: node scripts/ssr/run.mjs THREE_CHECKOUT 
 const checkout = path.resolve(checkoutArg);
 const inputs = path.resolve(inputsArg);
 const output = path.resolve(outputArg);
-const local = fileURLToPath(new URL('./', import.meta.url));
+const local = path.resolve(fileURLToPath(new URL('./', import.meta.url)));
 fs.mkdirSync(output, { recursive: true });
 const puppeteer = createRequire(path.join(checkout, 'package.json'))('puppeteer');
 const protocol = JSON.parse(fs.readFileSync(new URL('../../docs/research/ssr-protocol.json', import.meta.url), 'utf8'));
-const report = { protocol, ssrSourceSha256: crypto.createHash('sha256').update(fs.readFileSync(path.join(checkout, 'examples/jsm/tsl/display/SSRNode.js'))).digest('hex'), inputs: {}, errors: [], complete: false };
+const report = { protocol, requestedWebGPUBackend: process.env.SSR_ADAPTER || 'd3d11', ssrSourceSha256: crypto.createHash('sha256').update(fs.readFileSync(path.join(checkout, 'examples/jsm/tsl/display/SSRNode.js'))).digest('hex'), inputs: {}, errors: [], complete: false };
 for (const method of ['fast', 'gsa']) for (let seed = 1; seed <= 4; seed++) {
   const name = `${method.toUpperCase()}-${seed}.f32`;
   report.inputs[name] = crypto.createHash('sha256').update(fs.readFileSync(path.join(inputs, name))).digest('hex');
@@ -35,19 +35,23 @@ const server = http.createServer((req, res) => {
     }
     const contentType = filename.endsWith('.html') ? 'text/html' : /\.(m?js)$/.test(filename) ? 'text/javascript' : 'application/octet-stream';
     res.writeHead(200, { 'Content-Type': contentType, 'Cache-Control': 'no-store' }); res.end(body);
-  } catch (error) { res.writeHead(404); res.end(error.message); }
+  } catch (error) { console.error(`HTTP ${req.url}: ${error.message}`); res.writeHead(404); res.end(error.message); }
 });
 let browser;
 try {
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   browser = await puppeteer.launch({ executablePath: process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true, protocolTimeout: 1800000,
-    args: ['--enable-unsafe-webgpu', '--use-webgpu-adapter=d3d11', '--disable-software-rasterizer', '--disable-frame-rate-limit', '--disable-gpu-vsync'] });
+    args: ['--enable-unsafe-webgpu', `--use-webgpu-adapter=${process.env.SSR_ADAPTER || 'd3d11'}`, '--disable-software-rasterizer', '--disable-frame-rate-limit', '--disable-gpu-vsync'] });
   const page = await browser.newPage();
   await page.setViewport({ width: 400, height: 400 });
-  page.on('pageerror', error => { report.errors.push(error.message); console.error(error.message); });
-  page.on('console', message => { if (message.type() === 'error') { report.errors.push(message.text()); console.error(message.text()); } });
-  await page.goto(`http://127.0.0.1:${server.address().port}`);
-  await page.waitForFunction(() => window.ssrReady, { timeout: 120000 });
+  let rejectBrowserFailure;
+  const browserFailure = new Promise((resolve, reject) => { rejectBrowserFailure = reject; });
+  const guard = promise => Promise.race([promise, browserFailure]);
+  const fatal = message => { report.errors.push(message); console.error(message); rejectBrowserFailure(new Error(message)); };
+  page.on('pageerror', error => fatal(error.message));
+  page.on('console', message => { if (message.type() === 'error') fatal(message.text()); });
+  await guard(page.goto(`http://127.0.0.1:${server.address().port}`));
+  await guard(page.waitForFunction(() => window.ssrReady, { timeout: 120000 }));
   report.adapter = await page.evaluate(async () => { const adapter = await navigator.gpu.requestAdapter(); return { vendor: adapter.info.vendor, architecture: adapter.info.architecture, fallback: adapter.info.isFallbackAdapter ?? adapter.isFallbackAdapter }; });
   const cdp = await browser.target().createCDPSession();
   report.renderer = (await cdp.send('SystemInfo.getInfo')).gpu.auxAttributes.glRenderer;
@@ -56,7 +60,7 @@ try {
   for (const method of ['reference', 'fast', 'gsa']) {
     if (method !== 'reference') await page.evaluate(urls => window.ssrBench.setMasks(urls), Array.from({ length: 4 }, (_, i) => `/inputs/${method.toUpperCase()}-${i + 1}.f32`));
     console.log(`Starting ${method}`);
-    const snapshots = await page.evaluate((name, n) => window.ssrBench.run(name, n), method, method === 'reference' ? 4096 : 128);
+    const snapshots = await guard(page.evaluate((name, n) => window.ssrBench.run(name, n), method, method === 'reference' ? 4096 : 128));
     for (const [count, pixels] of Object.entries(snapshots)) {
       const array = Float32Array.from(pixels);
       if (!array.every(Number.isFinite)) throw new Error(`Nonfinite ${method} ${count}`);
@@ -70,7 +74,7 @@ try {
   for (const [order, methods] of [['fast-then-gsa', ['fast', 'gsa']], ['gsa-then-fast', ['gsa', 'fast']]]) {
     for (const method of methods) {
       await page.evaluate(urls => window.ssrBench.setMasks(urls), Array.from({ length: 4 }, (_, i) => `/inputs/${method.toUpperCase()}-${i + 1}.f32`));
-      const measurement = await page.evaluate(() => window.ssrBench.throughput());
+      const measurement = await guard(page.evaluate(() => window.ssrBench.throughput()));
       report.throughput.push({ order, method, ...measurement });
       console.log(JSON.stringify({ order, method, ...measurement }));
     }
