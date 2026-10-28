@@ -1,5 +1,5 @@
 // node scripts/ssr/run.mjs THREE_CHECKOUT INPUT_DIRECTORY OUTPUT_DIRECTORY
-// Inputs: fast-s1.f32 through fast-s4.f32 and gsa-s1.f32 through gsa-s4.f32.
+// Inputs: FAST-1.f32 through FAST-4.f32 and GSA-1.f32 through GSA-4.f32.
 import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
@@ -18,7 +18,7 @@ const puppeteer = createRequire(path.join(checkout, 'package.json'))('puppeteer'
 const protocol = JSON.parse(fs.readFileSync(new URL('../../docs/research/ssr-protocol.json', import.meta.url), 'utf8'));
 const report = { protocol, inputs: {}, errors: [], complete: false };
 for (const method of ['fast', 'gsa']) for (let seed = 1; seed <= 4; seed++) {
-  const name = `${method}-s${seed}.f32`;
+  const name = `${method.toUpperCase()}-${seed}.f32`;
   report.inputs[name] = crypto.createHash('sha256').update(fs.readFileSync(path.join(inputs, name))).digest('hex');
 }
 const server = http.createServer((req, res) => {
@@ -54,12 +54,13 @@ try {
   if (report.adapter.fallback !== false || !/AMD|NVIDIA|Intel/i.test(report.renderer) || /SwiftShader|llvmpipe|lavapipe|Microsoft Basic/i.test(report.renderer)) throw new Error('Physical GPU required');
   console.log(JSON.stringify({ adapter: report.adapter, renderer: report.renderer }));
   for (const method of ['reference', 'fast', 'gsa']) {
-    if (method !== 'reference') await page.evaluate(urls => window.ssrBench.setMasks(urls), Array.from({ length: 4 }, (_, i) => `/inputs/${method}-s${i + 1}.f32`));
+    if (method !== 'reference') await page.evaluate(urls => window.ssrBench.setMasks(urls), Array.from({ length: 4 }, (_, i) => `/inputs/${method.toUpperCase()}-${i + 1}.f32`));
     console.log(`Starting ${method}`);
     const snapshots = await page.evaluate((name, n) => window.ssrBench.run(name, n), method, method === 'reference' ? 4096 : 128);
     for (const [count, pixels] of Object.entries(snapshots)) {
       const array = Float32Array.from(pixels);
       if (!array.every(Number.isFinite)) throw new Error(`Nonfinite ${method} ${count}`);
+      if (!array.some(value => Math.abs(value) > 1e-5)) throw new Error(`Empty reflection ${method} ${count}`);
       fs.writeFileSync(path.join(output, `${method}-${count}.f32`), Buffer.from(array.buffer));
     }
     await page.screenshot({ path: path.join(output, `${method}.png`) });
