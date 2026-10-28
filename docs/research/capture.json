@@ -27,6 +27,7 @@
   "temporalBlur": "running average",
   "note": "Canvas readback of actual GPU rendering. Accelerated sample-count demonstration, not a frame-rate benchmark.",
   "errors": [],
+  "exampleSHA256": "ecbde0ef6a3bf1fde30200a44f1532178d14f3df5d4dab1c29ce7300b9f03210",
   "adapter": {
     "vendor": "amd",
     "architecture": "gcn-5",

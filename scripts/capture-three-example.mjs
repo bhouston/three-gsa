@@ -27,7 +27,10 @@ const html = source.replace(marker, `window.captureGSA = {
   resetAccumulation();
  },
  async next() {
+  const before = renderer._nodes.nodeFrame.frameId;
+  renderer._nodes.nodeFrame.update();
   animate();
+  if (renderer._nodes.nodeFrame.frameId !== before + 1) throw new Error("Expected one frame advance per sample");
   await renderer.backend.device.queue.onSubmittedWorkDone();
   return renderer.domElement.toDataURL().split(',')[1];
  }
@@ -79,3 +82,4 @@ try {
  if (browser) await browser.close();
  await new Promise(resolve => server.close(resolve));
 }
+

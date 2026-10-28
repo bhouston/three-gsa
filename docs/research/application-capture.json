@@ -1,0 +1,315 @@
+{
+  "protocol": {
+    "version": 1,
+    "frozenBeforeMeasurement": true,
+    "size": 128,
+    "frames": 128,
+    "prefixes": [
+      1,
+      4,
+      16,
+      32,
+      64,
+      128
+    ],
+    "seedPairs": [
+      [
+        1,
+        2
+      ],
+      [
+        3,
+        4
+      ]
+    ],
+    "methods": [
+      "FAST",
+      "GSA"
+    ],
+    "cases": [
+      "coverage",
+      "shadow",
+      "ao-wall",
+      "ggx-environment",
+      "camera-shadow",
+      "moving-shadow"
+    ],
+    "sampleEncoding": "8-bit bin centers; z,y,x; frame cycle shift (37,71) every 32 frames; independent masks for dimensions",
+    "temporalFilters": [
+      "box",
+      "ema-0.1"
+    ],
+    "spatialFilters": [
+      "identity",
+      "binomial-3",
+      "gaussian-sigma1-radius3"
+    ],
+    "cameraMotion": "background one integer pixel right per frame, nearer foreground occluder two pixels right per frame; exact per-object previous-pixel reprojection; revealed boundary and object-ID changes reset history",
+    "movingBlocker": "blocker center x=0.6*sin(frame*0.08); no perfect-history assumption",
+    "metrics": [
+      "noiseRMSE versus identically filtered analytic truth history",
+      "totalRMSE versus current unfiltered truth",
+      "filterBiasRMSE",
+      "temporalBiasRMSE",
+      "resetPixelRMSE"
+    ],
+    "limitations": "Correlated prefixes and filters are diagnostics, not independent trials. Two independent seed pairs, finite geometric scenes, no full renderer/PBR or performance extrapolation. GGX is normal/lobe environment sampling, not a complete BRDF estimator."
+  },
+  "inputs": {
+    "FAST-1.f32": {
+      "sourceSHA256": "3ab37c5fc23ebb5743eaff1ada7c996c77d233666b001953fb34f3597f6d3c2b",
+      "quantizedSHA256": "3ab37c5fc23ebb5743eaff1ada7c996c77d233666b001953fb34f3597f6d3c2b"
+    },
+    "FAST-2.f32": {
+      "sourceSHA256": "c71a155de2239b39b12e1c089e8992e3b53197e6ec971c1ce90c9ab8fac0ae95",
+      "quantizedSHA256": "7d3c2cb85818f0123262013f14b5494683aacff99a06269202cfdd5281b2b8f1"
+    },
+    "FAST-3.f32": {
+      "sourceSHA256": "dd1272b870912d4bc9895dae10b5ba9b10123c23742527137ed88c7d8ac79ced",
+      "quantizedSHA256": "602fb88c17b6959e6f087bbe517b0b7d9e03b25d1c98330d9ecdccee4f3bd2db"
+    },
+    "FAST-4.f32": {
+      "sourceSHA256": "41ba9f715304bbf8ee35fc853f4ce7dec57e8c2af0a5c639d9446fd66fd784e9",
+      "quantizedSHA256": "ab945bb7ce13f027b9c039a5a42eacc612e109dcb27daf0d18a16be830e7ca14"
+    },
+    "GSA-1.f32": {
+      "sourceSHA256": "de6ae2bf663540bca1715947ab0886406778a6cc754de171faa46d6895d018e3",
+      "quantizedSHA256": "de6ae2bf663540bca1715947ab0886406778a6cc754de171faa46d6895d018e3"
+    },
+    "GSA-2.f32": {
+      "sourceSHA256": "999e36cca419724258c3855669142b950a68827084956f9a6ae96a070300c3b1",
+      "quantizedSHA256": "ce2a3728a32011511fe4f7d6e7b3c18d52a542e58993fb61d3c469f098d5612d"
+    },
+    "GSA-3.f32": {
+      "sourceSHA256": "cab4da73d0fa518397f7629cb33bf3e45d5fc8bdc9ee11c8ae371b0650406804",
+      "quantizedSHA256": "6a3977278fa2adc0d927c3f1b262952488ba93543691ef5b50da21ad8b8e47bd"
+    },
+    "GSA-4.f32": {
+      "sourceSHA256": "b17736df104348adc082e9dbaa90eb3300092ffbecc2f1ae4db078218a43422c",
+      "quantizedSHA256": "04214e7b0e1226bc1dda6463e92d7d20c3b0782e5ca07eece36cfdd9cf8c18e1"
+    }
+  },
+  "runs": [
+    {
+      "method": "FAST",
+      "pair": [
+        1,
+        2
+      ],
+      "scene": "coverage",
+      "file": "FAST-pair1-coverage.f32"
+    },
+    {
+      "method": "FAST",
+      "pair": [
+        1,
+        2
+      ],
+      "scene": "shadow",
+      "file": "FAST-pair1-shadow.f32"
+    },
+    {
+      "method": "FAST",
+      "pair": [
+        1,
+        2
+      ],
+      "scene": "ao-wall",
+      "file": "FAST-pair1-ao-wall.f32"
+    },
+    {
+      "method": "FAST",
+      "pair": [
+        1,
+        2
+      ],
+      "scene": "ggx-environment",
+      "file": "FAST-pair1-ggx-environment.f32"
+    },
+    {
+      "method": "FAST",
+      "pair": [
+        1,
+        2
+      ],
+      "scene": "camera-shadow",
+      "file": "FAST-pair1-camera-shadow.f32"
+    },
+    {
+      "method": "FAST",
+      "pair": [
+        1,
+        2
+      ],
+      "scene": "moving-shadow",
+      "file": "FAST-pair1-moving-shadow.f32"
+    },
+    {
+      "method": "FAST",
+      "pair": [
+        3,
+        4
+      ],
+      "scene": "coverage",
+      "file": "FAST-pair3-coverage.f32"
+    },
+    {
+      "method": "FAST",
+      "pair": [
+        3,
+        4
+      ],
+      "scene": "shadow",
+      "file": "FAST-pair3-shadow.f32"
+    },
+    {
+      "method": "FAST",
+      "pair": [
+        3,
+        4
+      ],
+      "scene": "ao-wall",
+      "file": "FAST-pair3-ao-wall.f32"
+    },
+    {
+      "method": "FAST",
+      "pair": [
+        3,
+        4
+      ],
+      "scene": "ggx-environment",
+      "file": "FAST-pair3-ggx-environment.f32"
+    },
+    {
+      "method": "FAST",
+      "pair": [
+        3,
+        4
+      ],
+      "scene": "camera-shadow",
+      "file": "FAST-pair3-camera-shadow.f32"
+    },
+    {
+      "method": "FAST",
+      "pair": [
+        3,
+        4
+      ],
+      "scene": "moving-shadow",
+      "file": "FAST-pair3-moving-shadow.f32"
+    },
+    {
+      "method": "GSA",
+      "pair": [
+        1,
+        2
+      ],
+      "scene": "coverage",
+      "file": "GSA-pair1-coverage.f32"
+    },
+    {
+      "method": "GSA",
+      "pair": [
+        1,
+        2
+      ],
+      "scene": "shadow",
+      "file": "GSA-pair1-shadow.f32"
+    },
+    {
+      "method": "GSA",
+      "pair": [
+        1,
+        2
+      ],
+      "scene": "ao-wall",
+      "file": "GSA-pair1-ao-wall.f32"
+    },
+    {
+      "method": "GSA",
+      "pair": [
+        1,
+        2
+      ],
+      "scene": "ggx-environment",
+      "file": "GSA-pair1-ggx-environment.f32"
+    },
+    {
+      "method": "GSA",
+      "pair": [
+        1,
+        2
+      ],
+      "scene": "camera-shadow",
+      "file": "GSA-pair1-camera-shadow.f32"
+    },
+    {
+      "method": "GSA",
+      "pair": [
+        1,
+        2
+      ],
+      "scene": "moving-shadow",
+      "file": "GSA-pair1-moving-shadow.f32"
+    },
+    {
+      "method": "GSA",
+      "pair": [
+        3,
+        4
+      ],
+      "scene": "coverage",
+      "file": "GSA-pair3-coverage.f32"
+    },
+    {
+      "method": "GSA",
+      "pair": [
+        3,
+        4
+      ],
+      "scene": "shadow",
+      "file": "GSA-pair3-shadow.f32"
+    },
+    {
+      "method": "GSA",
+      "pair": [
+        3,
+        4
+      ],
+      "scene": "ao-wall",
+      "file": "GSA-pair3-ao-wall.f32"
+    },
+    {
+      "method": "GSA",
+      "pair": [
+        3,
+        4
+      ],
+      "scene": "ggx-environment",
+      "file": "GSA-pair3-ggx-environment.f32"
+    },
+    {
+      "method": "GSA",
+      "pair": [
+        3,
+        4
+      ],
+      "scene": "camera-shadow",
+      "file": "GSA-pair3-camera-shadow.f32"
+    },
+    {
+      "method": "GSA",
+      "pair": [
+        3,
+        4
+      ],
+      "scene": "moving-shadow",
+      "file": "GSA-pair3-moving-shadow.f32"
+    }
+  ],
+  "gpu": {
+    "vendor": "amd",
+    "architecture": "gcn-5",
+    "fallback": false
+  }
+}

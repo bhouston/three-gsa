@@ -9,8 +9,8 @@ The search started while exploring noise for Three.js screen-space reflections.
 The approximately 3 MB packed noise atlas motivated a search for cheaper
 construction and a smaller scalar payload. AI agents proposed, implemented and
 evaluated alternatives. A raw-scalar cancellation false lead prompted broader
-transformed-function and phase-aware tests. This configuration is a promising
-result of that process, not a proof of universal superiority or an SSR benchmark.
+transformed-function and phase-aware tests. The resulting profile improves most measured diagnostics, and added application
+checks establish both useful rendering gains and specific losses.
 
 ## Evaluated profile
 
@@ -23,7 +23,10 @@ result of that process, not a proof of universal superiority or an SSR benchmark
 - Acceptance suppression floor 2; temperature .001 decreases to zero over the
   first 1,500 iterations, followed by 1,500 greedy iterations.
 
-The truncated mixed kernel is a heuristic, not guaranteed positive semidefinite.
+The implemented combined Float32 kernel has positive convolution eigenvalues on
+all 21 tested periodic grids (sizes 8, 32, 128; depths 2–128). The default grid
+minimum is 0.138983. [kernel-spectrum.json](kernel-spectrum.json) records the full
+check; `scripts/kernel-spectrum.py` recomputes it using the actual library taps.
 Simultaneous accepted swaps do not guarantee global descent. The short run and
 the constraints work well on the measured tasks; a different renderer, function,
 filter or playback pattern can change the outcome.
@@ -91,10 +94,38 @@ single-frame `sin(14*pi*u)` (+6.77%/+7.03% for seeds 1/2) and `cos(16*pi*u)`
 (+6.55%/+6.66%). Threshold .83 after 16 blurred frames regresses about 3.8% on seed
 1. Full provenance and chart values are in [gsa-chart-data.json](gsa-chart-data.json).
 
-The published audit is a development suite. We have not established motion,
-reprojection, disocclusion, multidimensional path sampling, independent SSR scene
-quality or general state-of-the-art superiority. The interactive example uses a
-3×3 binomial blur, not the analysis filter; its visual result is illustrative.
+## Application validation
+
+![All 432 matched total-image error comparisons](gsa-applications.png)
+
+The premeasurement [application protocol](application-protocol.json) adds six
+geometric workloads, two independent seed pairs (1/2 and 3/4), six prefixes
+(1,4,16,32,64,128), running-average and EMA(.1) histories, and raw/binomial3/
+Gaussian-sigma1 reconstruction. [applications.json](applications.json) retains
+all 864 method rows, analytic history error, current-image total error, filter
+bias, history lag and reset-pixel diagnostics. [application-capture.json](application-capture.json)
+records adapter and input hashes. All quality inputs use 8-bit midpoints.
+Total RMSE comparisons, including lag and filter bias: **270 lower, 162 higher**.
+Bias-only diagnostics are identical for both masks and are not counted as gains.
+
+Coverage, finite-distance wall AO and the GGX-normal environment probe favor GSA
+in their median comparisons. Rectangular area-light shadows, a moving blocker and
+exact integer camera/parallax reprojection favor FAST slightly in their median
+comparisons. The GGX probe is separable. Analytic geometric references independently
+provide the expected signal. Algorithm parameters were fixed before measurement.
+
+![Actual Three.js SSR over all 32 start phases](gsa-ssr.png)
+
+See [SSR.md](SSR.md) for the complete rendered-scene protocol, 22/24 gains, two
+single-frame losses, reference convergence, explicit lifecycle assertions and
+GPU-completed throughput measurements. Every requested sample advances actual
+SSR state; independent captures reproduce direct cumulative images within 2.98e-8.
+The four-mask test evaluates coupled dimensions in the actual Three.js SSRNode.
+
+These application tests were added after choosing GSA's configuration. Correlated
+filters, regions and frame counts measure robustness rather than independent
+statistical trials. They establish concrete workload choices for the tested
+scenes, filters and histories.
 
 ## Hardware animation
 
@@ -103,7 +134,8 @@ quality or general state-of-the-art superiority. The interactive example uses a
 Fourteen selected captures from 1 through 128 accumulated samples of the original
 Three.js sphere example. Both halves receive the same filtering. Frames come
 from physical GPU canvas readback; the captioned GIF is accelerated and is not an
-FPS or construction benchmark. [capture.json](capture.json) records the adapter,
+FPS or construction benchmark. The capture explicitly advances NodeFrame for
+every manual sample, refreshing FRAME-scoped filter nodes before readback. [capture.json](capture.json) records the adapter,
 viewport, filters and sample counts.
 
 ## Reproduce
@@ -139,3 +171,28 @@ does not automatically overwrite or statistically validate these two trials.
   [FAST paper](https://arxiv.org/abs/2310.15364).
 - [Scalar Spatiotemporal Blue Noise Masks](https://arxiv.org/abs/2112.09629).
 - [Belcour–Heitz screen-space sampling study](https://belcour.github.io/blog/supp/2021-sampling-bluenoise/).
+
+## Reproduce the added checks
+
+Build the library first; use the Python requirements above. Input preparation
+extracts seed 1 from the pinned PNGs and generates seeds 2–4 with frozen profiles.
+Allow several minutes on the measured GPU. Generated Float32 volumes remain
+outside source control. Both runners close their browsers and servers.
+
+```powershell
+node scripts/prepare-application-inputs.mjs /path/to/three.js /path/to/inputs --generate
+node scripts/applications/run.mjs /path/to/inputs /path/to/applications
+python scripts/applications/score.py /path/to/applications
+$env:SSR_ADAPTER = 'd3d12'
+node scripts/ssr/run.mjs /path/to/three.js /path/to/inputs /path/to/ssr
+python scripts/ssr/analyze.py /path/to/ssr
+node scripts/ssr/run.mjs /path/to/three.js /path/to/inputs /path/to/ssr --phases-only
+python scripts/ssr/analyze-phases.py /path/to/ssr
+python scripts/kernel-spectrum.py docs/research/kernel-spectrum.json
+python docs/research/build-application-chart.py
+python scripts/ssr/plot.py
+```
+
+The application runner expects its installed Three.js/Puppeteer checkout at
+`../three.js` relative to the working directory. D3D11 handles the geometric
+compute test; actual SSR requires hardware D3D12 on this machine.

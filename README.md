@@ -21,7 +21,7 @@ The full comparison below includes the 53 regressions and three ties per seed.
 | Median relative change across 318 diagnostics, seed 1 | **5.6% lower** |
 | Largest regression | **7.03% higher**: single-frame blurred high-frequency sine |
 
-The quality rows use the same 128×128×32 masks, 8-bit midpoint decoding, all 32
+The integration-RMSE rows use the same 128×128×32 masks, 8-bit midpoint decoding, all 32
 starting phases and identical filters. Construction compares GSA's 3,000-step
 profile with FAST's 10,000-step profile on a physical AMD GCN-5 GPU; each timed
 run completes its GPU readback before the next begins.
@@ -32,11 +32,58 @@ run completes its GPU readback before the next begins.
 
 ![Representative improvements and the specific cases favoring FAST](docs/research/gsa-tradeoffs.png)
 
-These measurements favor GSA for temporally accumulated scalar sampling. FAST
-retains an advantage on several single-frame, high-frequency transforms:
-`sin(14*pi*u)`, `cos(16*pi*u)`, and the tested .83 threshold at 16 frames.
-See [the reproducible evidence](docs/research/README.md) for the exact inputs,
-filters, timing records and complete measurements.
+## Graphics workloads
+
+GSA lowers total image RMSE in **270 of 432** geometric application/filter/frame
+comparisons. The chart includes every gain and loss. Each workload has 72
+comparisons: two independent seed pairs, six frame counts, two temporal filters
+and three spatial filters. Total RMSE includes reconstruction bias and temporal
+lag against the current analytic image. These are correlated diagnostics, not
+independent statistical trials.
+
+![All geometric application comparisons](docs/research/gsa-applications.png)
+
+| Workload | Lower / higher error | Median RMSE change |
+| --- | ---: | ---: |
+| Stochastic coverage | 69 / 3 | **−7.21%** |
+| GGX normal/lobe environment probe | 66 / 6 | **−4.17%** |
+| Finite-distance AO at an infinite wall | 57 / 15 | **−1.13%** |
+| Camera motion, parallax and history resets | 32 / 40 | +0.13% |
+| Moving rectangular blocker | 27 / 45 | +0.50% |
+| Static rectangular area-light shadow | 19 / 53 | +0.79% |
+
+The GGX probe tests a separable normal/lobe integrand. The camera test uses exact
+integer reprojection and object-aware history resets.
+
+### Actual Three.js reflections
+
+![Actual SSR convergence and all gains and losses](docs/research/gsa-ssr.png)
+
+The actual Three.js SSR test exercises coupled sampling dimensions, GGX reflection
+and ray-march hit/miss. GSA improves **22 of 24** phase-averaged measurements.
+Across all 32 starting phases, blurred reflection RMSE falls **8.38% at 32
+frames**, **9.60% at 64** and **10.70% at 128**. At 64 and 128 frames every
+starting phase improves, with and without blur. Single-frame blurred error is
+**0.41–0.45% higher**. Four independently generated masks supply sampling
+dimensions; the reference uses 4,096 independent PCG samples of the same SSR
+estimator. The scene has three roughness levels and a fixed camera.
+
+Rendering throughput is effectively equal: FAST **2,212 / 2,219** versus GSA
+**2,222 / 2,207** GPU-completed frames/s in reversed-order, three-second windows
+on the physical AMD GPU using D3D12. The measured advantage is reconstruction
+quality and construction cost, with equal texture lookup cost.
+
+**Choose GSA** for the tested accumulated coverage, AO and filtered SSR workloads.
+**Choose FAST Separate** for the tested rectangular soft-shadow cases or when
+single-frame high-frequency transformed noise dominates: `sin(14*pi*u)` and
+`cos(16*pi*u)` have up to 7.03% higher blurred error with GSA. Moving geometry and
+camera histories have mixed results, with FAST slightly ahead in the median
+shadow measurements. GSA performs better across most measured diagnostics; these
+results identify specific application choices rather than establishing a winner
+for most graphics applications.
+
+See [the reproducible evidence](docs/research/README.md) for exact inputs,
+filters, analytic references, lifecycle checks, timing records and full results.
 
 ![Standalone example on a physical AMD GPU: white noise left, GSA right](docs/research/standalone-example.png)
 
@@ -87,8 +134,9 @@ It optionally accepts an existing `GPUDevice`, which remains owned by the caller
 Otherwise it requests a hardware adapter and destroys its device after completion.
 Buffers are released on success, failure or cancellation. Cancellation is checked
 between synchronized 100-iteration batches. Defaults preserve the evaluated method;
-smaller power-of-two dimensions and other iteration counts have not been quality
-validated by the published benchmark.
+the published quality profile is 128×128×32 at 3,000 iterations. A numerical
+check verifies positive eigenvalues for the implemented combined filter kernel
+on 21 periodic grids, spanning sizes 8/32/128 and depths 2–128.
 
 For TSL with a precomputed PNG:
 
@@ -114,11 +162,11 @@ for CPU use. Encoded samples are decoded at byte-stratum midpoints:
 pixel coordinates by `(37, 71)`, matching the benchmark. Changing playback changes
 the measured properties.
 
-The default mask is a **single scalar** per pixel per frame. Do not reuse the same
-value for every dimension of a path tracer. Motion, reprojection, disocclusions,
-multidimensional sampling and production SSR remain application-level validation
-work. Temporal stratification gives strong complete-stack behavior, but does not
-guarantee every arbitrary prefix, pixel trajectory or filter will improve.
+The default mask is a **single scalar** per pixel per frame. Use independently
+generated masks for independent dimensions, as in the four-mask SSR test. Reusing
+one scalar for every dimension creates correlated inputs. The benchmarked playback
+shifts spatial coordinates at every 32-frame wrap; this convention is part of
+reproducing the reported quality.
 
 ## Checks
 
@@ -143,8 +191,9 @@ and installed Chrome (`CHROME_PATH` can override the executable). It starts and
 stops its own local Vite server and browser. It validates actual WebGL2 PNG and
 DataTexture playback, TSL/WebGPU readback, mid-generation cancellation, controls,
 and the complete default generation against the evaluated mask's SHA-256 hashes.
-The recorded reference hash was reproduced on AMD GCN 5/D3D11; floating-point GPU
-optimization is not promised to be byte-identical across different adapters.
+The recorded reference hash was reproduced on AMD GCN 5/D3D11. Actual SSR
+validation also covers hardware D3D12. These records identify the tested adapter
+and backends; cross-device byte identity is not required for sampling quality.
 
 ## Origins and license
 
