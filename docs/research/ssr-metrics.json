@@ -1,0 +1,217 @@
+{
+  "reference": {
+    "raw/all": {
+      "half_to_full_rmse": 0.0011635031205607731,
+      "mean_reference": 0.01841682397971134
+    },
+    "raw/lower-half": {
+      "half_to_full_rmse": 0.0016389714196064634,
+      "mean_reference": 0.033388443285215175
+    },
+    "binomial3/all": {
+      "half_to_full_rmse": 0.0005980835510711063,
+      "mean_reference": 0.01841682397971134
+    },
+    "binomial3/lower-half": {
+      "half_to_full_rmse": 0.0008399758293020012,
+      "mean_reference": 0.033390265999381885
+    }
+  },
+  "metrics": [
+    {
+      "filter": "raw",
+      "region": "all",
+      "frames": 1,
+      "fast_rmse": 0.08084750323213848,
+      "gsa_rmse": 0.07668426940912058,
+      "relative_change_percent": -5.149489664589824
+    },
+    {
+      "filter": "raw",
+      "region": "all",
+      "frames": 4,
+      "fast_rmse": 0.03555971997692982,
+      "gsa_rmse": 0.03402825790948762,
+      "relative_change_percent": -4.306732641414968
+    },
+    {
+      "filter": "raw",
+      "region": "all",
+      "frames": 16,
+      "fast_rmse": 0.01634038866961044,
+      "gsa_rmse": 0.0159942018813061,
+      "relative_change_percent": -2.1185958015072948
+    },
+    {
+      "filter": "raw",
+      "region": "all",
+      "frames": 32,
+      "fast_rmse": 0.011138057859754642,
+      "gsa_rmse": 0.010928463977511316,
+      "relative_change_percent": -1.881781230466184
+    },
+    {
+      "filter": "raw",
+      "region": "all",
+      "frames": 64,
+      "fast_rmse": 0.00789415067064955,
+      "gsa_rmse": 0.0077809348481071815,
+      "relative_change_percent": -1.4341735706072334
+    },
+    {
+      "filter": "raw",
+      "region": "all",
+      "frames": 128,
+      "fast_rmse": 0.005746299260764393,
+      "gsa_rmse": 0.005510140106277887,
+      "relative_change_percent": -4.10976080029447
+    },
+    {
+      "filter": "raw",
+      "region": "lower-half",
+      "frames": 1,
+      "fast_rmse": 0.11414606833144583,
+      "gsa_rmse": 0.10767274061337477,
+      "relative_change_percent": -5.671091271645434
+    },
+    {
+      "filter": "raw",
+      "region": "lower-half",
+      "frames": 4,
+      "fast_rmse": 0.05008214827116914,
+      "gsa_rmse": 0.04784754157426584,
+      "relative_change_percent": -4.461882674848649
+    },
+    {
+      "filter": "raw",
+      "region": "lower-half",
+      "frames": 16,
+      "fast_rmse": 0.022990850536702228,
+      "gsa_rmse": 0.022563180311440036,
+      "relative_change_percent": -1.86017574504026
+    },
+    {
+      "filter": "raw",
+      "region": "lower-half",
+      "frames": 32,
+      "fast_rmse": 0.015702048977501524,
+      "gsa_rmse": 0.015409525459807793,
+      "relative_change_percent": -1.8629639871386772
+    },
+    {
+      "filter": "raw",
+      "region": "lower-half",
+      "frames": 64,
+      "fast_rmse": 0.011126495497159767,
+      "gsa_rmse": 0.010966692269598932,
+      "relative_change_percent": -1.4362404370866555
+    },
+    {
+      "filter": "raw",
+      "region": "lower-half",
+      "frames": 128,
+      "fast_rmse": 0.008095547300872837,
+      "gsa_rmse": 0.0077724600282071616,
+      "relative_change_percent": -3.9909256367489987
+    },
+    {
+      "filter": "binomial3",
+      "region": "all",
+      "frames": 1,
+      "fast_rmse": 0.04030615331680537,
+      "gsa_rmse": 0.038755368955930486,
+      "relative_change_percent": -3.847512682953791
+    },
+    {
+      "filter": "binomial3",
+      "region": "all",
+      "frames": 4,
+      "fast_rmse": 0.017451626173495646,
+      "gsa_rmse": 0.016698634943705156,
+      "relative_change_percent": -4.3147338953093195
+    },
+    {
+      "filter": "binomial3",
+      "region": "all",
+      "frames": 16,
+      "fast_rmse": 0.008138569526786148,
+      "gsa_rmse": 0.007662645378563437,
+      "relative_change_percent": -5.847761657086304
+    },
+    {
+      "filter": "binomial3",
+      "region": "all",
+      "frames": 32,
+      "fast_rmse": 0.005322719408685918,
+      "gsa_rmse": 0.005023645413502558,
+      "relative_change_percent": -5.618819483426341
+    },
+    {
+      "filter": "binomial3",
+      "region": "all",
+      "frames": 64,
+      "fast_rmse": 0.00381649057890851,
+      "gsa_rmse": 0.003575260325180431,
+      "relative_change_percent": -6.32073494590073
+    },
+    {
+      "filter": "binomial3",
+      "region": "all",
+      "frames": 128,
+      "fast_rmse": 0.0028520005168806593,
+      "gsa_rmse": 0.0026077522484227824,
+      "relative_change_percent": -8.564103232527476
+    },
+    {
+      "filter": "binomial3",
+      "region": "lower-half",
+      "frames": 1,
+      "fast_rmse": 0.056901698373533954,
+      "gsa_rmse": 0.05443244321077556,
+      "relative_change_percent": -4.3395104774357485
+    },
+    {
+      "filter": "binomial3",
+      "region": "lower-half",
+      "frames": 4,
+      "fast_rmse": 0.024555097106041715,
+      "gsa_rmse": 0.023368645579784564,
+      "relative_change_percent": -4.831793257153228
+    },
+    {
+      "filter": "binomial3",
+      "region": "lower-half",
+      "frames": 16,
+      "fast_rmse": 0.011456244896475594,
+      "gsa_rmse": 0.010815523671228679,
+      "relative_change_percent": -5.592768232844136
+    },
+    {
+      "filter": "binomial3",
+      "region": "lower-half",
+      "frames": 32,
+      "fast_rmse": 0.007493012367741619,
+      "gsa_rmse": 0.0070744340370659815,
+      "relative_change_percent": -5.586249029531443
+    },
+    {
+      "filter": "binomial3",
+      "region": "lower-half",
+      "frames": 64,
+      "fast_rmse": 0.00537260282773853,
+      "gsa_rmse": 0.005037780148051761,
+      "relative_change_percent": -6.232038556025266
+    },
+    {
+      "filter": "binomial3",
+      "region": "lower-half",
+      "frames": 128,
+      "fast_rmse": 0.004009589328233736,
+      "gsa_rmse": 0.0036728595449837995,
+      "relative_change_percent": -8.398111519272966
+    }
+  ],
+  "note": "Lower-half image ROI is rows 64 through 127 in WebGPU readback coordinates; SSR reflection output only, static scene and camera, independent PCG reference.",
+  "improvements": 24,
+  "regressions": 0
+}
