@@ -1,6 +1,6 @@
 # Evidence and reproduction
 
-GSA (GPU Stratified Annealing) is the particular experimental profile implemented
+GSA (GPU Stratified Annealing) is the profile implemented
 by this repository. It is derived from EA FAST and the Three.js research port;
 stratification and simulated annealing are established methods, not inventions of
 this project. See the package's third-party notices and FAST BSD-3-Clause license.

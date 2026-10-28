@@ -1,0 +1,174 @@
+{
+  "method": "Eigenvalues of the circular convolution matrix are the DFT of its first column. Actual float32 GSA coefficients are embedded on each periodic grid; duplicate taps are added on small grids.",
+  "scope": "Finite numerical check for the listed grids and implemented kernel, not a guarantee for arbitrary future mixtures.",
+  "rows": [
+    {
+      "size": 8,
+      "depth": 2,
+      "minimumRealEigenvalue": 0.32769721649670014,
+      "maximumImaginaryResidual": 0.0,
+      "tolerance": 2.7492763340331475e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 32,
+      "depth": 2,
+      "minimumRealEigenvalue": 0.32663108415350584,
+      "maximumImaginaryResidual": 3.469446951953614e-17,
+      "tolerance": 2.7492763340331475e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 128,
+      "depth": 2,
+      "minimumRealEigenvalue": 0.3265105555421865,
+      "maximumImaginaryResidual": 9.655658910607241e-17,
+      "tolerance": 2.7492763340331475e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 8,
+      "depth": 4,
+      "minimumRealEigenvalue": 0.2778538874736584,
+      "maximumImaginaryResidual": 0.0,
+      "tolerance": 2.749276346937165e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 32,
+      "depth": 4,
+      "minimumRealEigenvalue": 0.2771879075277469,
+      "maximumImaginaryResidual": 3.5561831257524545e-17,
+      "tolerance": 2.749276346937165e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 128,
+      "depth": 4,
+      "minimumRealEigenvalue": 0.2770061080522338,
+      "maximumImaginaryResidual": 1.0176075953400283e-16,
+      "tolerance": 2.749276346937165e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 8,
+      "depth": 8,
+      "minimumRealEigenvalue": 0.21564140603160123,
+      "maximumImaginaryResidual": 0.0,
+      "tolerance": 2.6809608860048088e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 32,
+      "depth": 8,
+      "minimumRealEigenvalue": 0.21531309539093157,
+      "maximumImaginaryResidual": 3.469446951953614e-17,
+      "tolerance": 2.6809608860048088e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 128,
+      "depth": 8,
+      "minimumRealEigenvalue": 0.2150790706744672,
+      "maximumImaginaryResidual": 9.0801931945661e-17,
+      "tolerance": 2.6809608860048088e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 8,
+      "depth": 16,
+      "minimumRealEigenvalue": 0.16348186357000938,
+      "maximumImaginaryResidual": 0.0,
+      "tolerance": 2.6026983638012876e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 32,
+      "depth": 16,
+      "minimumRealEigenvalue": 0.1634818635700094,
+      "maximumImaginaryResidual": 3.0357660829594124e-17,
+      "tolerance": 2.6026983638012876e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 128,
+      "depth": 16,
+      "minimumRealEigenvalue": 0.16319579206822094,
+      "maximumImaginaryResidual": 1.0327864257548253e-16,
+      "tolerance": 2.6026983638012876e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 8,
+      "depth": 32,
+      "minimumRealEigenvalue": 0.13914465901281353,
+      "maximumImaginaryResidual": 3.943785402416022e-18,
+      "tolerance": 2.5683467857919453e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 32,
+      "depth": 32,
+      "minimumRealEigenvalue": 0.13914465901281353,
+      "maximumImaginaryResidual": 3.5778671692021646e-17,
+      "tolerance": 2.5683467857919453e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 128,
+      "depth": 32,
+      "minimumRealEigenvalue": 0.13898323681291663,
+      "maximumImaginaryResidual": 9.362085759412331e-17,
+      "tolerance": 2.5683467857919453e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 8,
+      "depth": 64,
+      "minimumRealEigenvalue": 0.1345941365815322,
+      "maximumImaginaryResidual": 1.2301693422237347e-17,
+      "tolerance": 2.5621484079813128e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 32,
+      "depth": 64,
+      "minimumRealEigenvalue": 0.1345941365815322,
+      "maximumImaginaryResidual": 4.277282391033293e-17,
+      "tolerance": 2.5621484079813128e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 128,
+      "depth": 64,
+      "minimumRealEigenvalue": 0.134455615908025,
+      "maximumImaginaryResidual": 1.0956701517589846e-16,
+      "tolerance": 2.5621484079813128e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 8,
+      "depth": 128,
+      "minimumRealEigenvalue": 0.1344377897457252,
+      "maximumImaginaryResidual": 1.769960046582586e-17,
+      "tolerance": 2.5619370678339532e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 32,
+      "depth": 128,
+      "minimumRealEigenvalue": 0.1344377897457252,
+      "maximumImaginaryResidual": 4.8138576458356397e-17,
+      "tolerance": 2.5619370678339532e-14,
+      "nonnegativeWithinTolerance": true
+    },
+    {
+      "size": 128,
+      "depth": 128,
+      "minimumRealEigenvalue": 0.13430005325314062,
+      "maximumImaginaryResidual": 1.1281962169335496e-16,
+      "tolerance": 2.5619370678339532e-14,
+      "nonnegativeWithinTolerance": true
+    }
+  ]
+}

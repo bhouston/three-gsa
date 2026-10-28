@@ -1,14 +1,42 @@
 # three-gsa
 
-**GSA — GPU Stratified Annealing** is an experimental scalar sampling mask generator
-and playback library for Three.js. It combines a per-pixel temporal Latin hypercube
-with FAST-derived GPU swap optimization, a mixed filter objective and a finite
-simulated-annealing schedule.
+**GSA — GPU Stratified Annealing** is a new blue-noise sampling method and
+TypeScript library for Three.js. It combines per-pixel temporal stratification
+with filter-aware GPU optimization, keeping noise easier to remove with spatial
+and temporal reconstruction.
 
-The evaluated profile improves most of our scalar filtering diagnostics over FAST
-Separate, with measured regressions on others. It is not a claim of a universally
-better blue-noise sampler or a new state of the art. See [the research report](docs/research/README.md)
-for the benchmark, provenance, timings and tradeoffs.
+Compared with the 10,000-step FAST Separate reference, GSA generates its mask
+**1.99× faster** and produces lower error in **262 of 318 measured diagnostics**
+on each of two seeds. It improves every original spatial/temporal diagnostic.
+The full comparison below includes the 53 regressions and three ties per seed.
+
+| Measurement | GSA result versus FAST Separate |
+| --- | --- |
+| Construction, seed 1 | 30.720 s vs 61.233 s — **1.993× faster** |
+| Construction, seed 2 | 30.756 s vs 61.339 s — **1.994× faster** |
+| Blurred 32-frame scalar integration RMSE | **22.8% lower** |
+| Blurred 32-frame threshold-at-.5 RMSE | **25.5% lower** |
+| Blurred 32-frame squared-integrand RMSE | **20.0% lower** |
+| Blurred 32-frame fourth-power RMSE | **14.7% lower** |
+| Median relative change across 318 diagnostics, seed 1 | **5.6% lower** |
+| Largest regression | **7.03% higher**: single-frame blurred high-frequency sine |
+
+The quality rows use the same 128×128×32 masks, 8-bit midpoint decoding, all 32
+starting phases and identical filters. Construction compares GSA's 3,000-step
+profile with FAST's 10,000-step profile on a physical AMD GCN-5 GPU; each timed
+run completes its GPU readback before the next begins.
+
+![Spatial and temporal convergence, with aligned spread and all-phase RMSE](docs/research/gsa-convergence.png)
+
+![All 318 measured improvements and regressions, both seeds](docs/research/gsa-audit.png)
+
+![Representative improvements and the specific cases favoring FAST](docs/research/gsa-tradeoffs.png)
+
+These measurements favor GSA for temporally accumulated scalar sampling. FAST
+retains an advantage on several single-frame, high-frequency transforms:
+`sin(14*pi*u)`, `cos(16*pi*u)`, and the tested .83 threshold at 16 frames.
+See [the reproducible evidence](docs/research/README.md) for the exact inputs,
+filters, timing records and complete measurements.
 
 ![Standalone example on a physical AMD GPU: white noise left, GSA right](docs/research/standalone-example.png)
 
@@ -124,7 +152,7 @@ This variant was found through AI-assisted exploration and evaluation during the
 Three.js noise experiments in [PR 116](https://github.com/bhouston/three.js/pull/116),
 building on [PR 115](https://github.com/bhouston/three.js/pull/115) and EA FAST.
 Stratification, annealing and filter-based noise objectives are established ideas;
-the contribution here is an evaluated experimental combination and implementation.
+the contribution here is this combination of constraints, objective and schedule.
 
 New code is MIT licensed. FAST-derived portions retain EA's BSD-3-Clause license.
 See [third-party notices](packages/three-gsa/THIRD_PARTY_NOTICES.md) and the included

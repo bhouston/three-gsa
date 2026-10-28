@@ -1,7 +1,7 @@
 {
   "name": "three-gsa",
   "version": "0.1.0",
-  "description": "Experimental GPU Stratified Annealing scalar sampling masks for Three.js",
+  "description": "GPU Stratified Annealing scalar sampling masks for Three.js",
   "type": "module",
   "license": "MIT AND BSD-3-Clause",
   "files": ["dist", "LICENSE", "LICENSE-FAST.txt", "THIRD_PARTY_NOTICES.md"],
