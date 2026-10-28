@@ -4,7 +4,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
 import { createRequire } from 'node:module';
-import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 const require = createRequire(path.resolve('../three.js/package.json'));
 const puppeteer = require('puppeteer');

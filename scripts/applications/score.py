@@ -30,7 +30,8 @@ def reference_checks():
     return {'ggxMeanZ':ggx_mean(.35),'ggxQuadrature':float(np.mean(np.sqrt((1-u)/(1-(1-.35**2)*u)))),'diskCapExact':float(cap),'diskCapQuadrature':float(numeric),'rectangleGridBlocked':float(hits),'rectangleExactBlocked':float(exact)}
 def truth(scene,t):
     x=px-t/32 if scene=='camera-shadow' else px
-    ids=((x>.5)&(x<1)).astype(int) if scene=='camera-shadow' else np.zeros_like(xx)
+    foreground=px-2*t/32
+    ids=((foreground>.5)&(foreground<1)).astype(int) if scene=='camera-shadow' else np.zeros_like(xx)
     if scene=='coverage': return .1+.8*(xx+.5)/N,ids
     if scene=='ao-wall':
         d=.1+.8*(xx+.5)/N
@@ -64,9 +65,10 @@ for run in capture['runs']:
         current,ids=truth(scene,t)
         reset=np.full((N,N),t==0)
         if scene=='camera-shadow' and t:
-            for a in (sums,true_sums,counts,ema,true_ema): a[:,1:]=a[:,:-1].copy()
-            previous=np.empty_like(ids);previous[:,1:]=prev_ids[:,:-1];previous[:,0]=-1
-            reset=previous!=ids;reset[:,0]=True
+            previous_x=xx-(1+ids);valid=previous_x>=0;previous_x=np.maximum(0,previous_x)
+            for a in (sums,true_sums,counts,ema,true_ema): a[:]=a[yy,previous_x].copy()
+            previous=prev_ids[yy,previous_x]
+            reset=(previous!=ids)|~valid
         for a in (sums,true_sums,counts,ema,true_ema):a[reset]=0
         sums+=raw[t];true_sums+=current;counts+=1
         ema=np.where(reset,raw[t],.9*ema+.1*raw[t]);true_ema=np.where(reset,current,.9*true_ema+.1*current)

@@ -26,7 +26,8 @@ fn sampleIndex(x:u32,y:u32,t:u32)->u32{return (t%32u)*16384u+((y+71u*(t/32u))%12
   var center=0.0;if(scene==5u){center=0.6*sin(f32(t)*0.08);}
   value=select(1.0,0.0,abs(bx-center)<0.6&&abs(by)<0.45);
   // Foreground object crossing: separate object ID, constant analytic radiance.
-  if(scene==4u&&px>0.5&&px<1.0){value=0.25;}
+  let foregroundX=(f32(x)+0.5-64.0)/32.0-2.0*f32(t)/32.0;
+  if(scene==4u&&foregroundX>0.5&&foregroundX<1.0){value=0.25;}
  }
  output[t*16384u+p]=value;
 }
