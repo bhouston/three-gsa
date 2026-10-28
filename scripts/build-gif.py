@@ -28,7 +28,7 @@ for count in metadata['frames']:
     draw.text((18, 12), 'White noise', fill='white', font=font)
     draw.text((402, 12), 'GSA', fill='#59d3ba', font=font)
     draw.text((605, 12), f'{count:3} samples', fill='white', font=font)
-    draw.text((18, 538), 'Spatial blur + temporal average · accelerated playback, not an FPS benchmark', fill='white', font=small)
+    draw.text((18, 538), 'Spatial blur + temporal average', fill='white', font=small)
     frames.append(frame.quantize(colors=128, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE))
     if count == 32:
         frame.save(output.with_suffix('.png'))

@@ -58,7 +58,7 @@ axis.set(xlabel='Accumulated samples', ylabel='GSA RMSE change relative to FAST 
 axis.grid(axis='y', alpha=.18)
 axis.legend(ncol=2, fontsize=8, loc='lower left')
 axis.text(.99, .95, 'Below zero = lower error\nOnly losses: single-frame filtered SSR', transform=axis.transAxes, ha='right', va='top', fontsize=9)
-fig.suptitle('GSA in actual Three.js stochastic screen-space reflections\n128×128 · static scene · four independent seed dimensions · physical AMD WebGPU / requested D3D12', fontsize=13)
+fig.suptitle('GSA in actual Three.js stochastic screen-space reflections\n128×128 · static scene · four independent seed dimensions · WebGPU', fontsize=13)
 fig.supxlabel('Independent 4096-sample PCG reference; 32 starting phases. Rendering throughput: FAST/GSA differ by approximately ±0.5% across two orders.', fontsize=9)
 for extension in ['png', 'svg']:
     fig.savefig(destination / f'gsa-ssr.{extension}', dpi=180, facecolor='white')

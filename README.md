@@ -23,7 +23,7 @@ The full comparison below includes the 53 regressions and three ties per seed.
 
 The integration-RMSE rows use the same 128×128×32 masks, 8-bit midpoint decoding, all 32
 starting phases and identical filters. Construction compares GSA's 3,000-step
-profile with FAST's 10,000-step profile on a physical AMD GCN-5 GPU; each timed
+profile with FAST's 10,000-step profile; each timed
 run completes its GPU readback before the next begins.
 
 ![Spatial and temporal convergence, with aligned spread and all-phase RMSE](docs/research/gsa-convergence.png)
@@ -70,7 +70,7 @@ estimator. The scene has three roughness levels and a fixed camera.
 
 Rendering throughput is effectively equal: FAST **2,212 / 2,219** versus GSA
 **2,222 / 2,207** GPU-completed frames/s in reversed-order, three-second windows
-on the physical AMD GPU using D3D12. The measured advantage is reconstruction
+using WebGPU. The measured advantage is reconstruction
 quality and construction cost, with equal texture lookup cost.
 
 **Choose GSA** for the tested accumulated coverage, AO and filtered SSR workloads.
@@ -85,7 +85,7 @@ for most graphics applications.
 See [the reproducible evidence](docs/research/README.md) for exact inputs,
 filters, analytic references, lifecycle checks, timing records and full results.
 
-![Standalone example on a physical AMD GPU: white noise left, GSA right](docs/research/standalone-example.png)
+![Standalone example: white noise left, GSA right](docs/research/standalone-example.png)
 
 ## Run the example
 
@@ -191,9 +191,8 @@ and installed Chrome (`CHROME_PATH` can override the executable). It starts and
 stops its own local Vite server and browser. It validates actual WebGL2 PNG and
 DataTexture playback, TSL/WebGPU readback, mid-generation cancellation, controls,
 and the complete default generation against the evaluated mask's SHA-256 hashes.
-The recorded reference hash was reproduced on AMD GCN 5/D3D11. Actual SSR
-validation also covers hardware D3D12. These records identify the tested adapter
-and backends; cross-device byte identity is not required for sampling quality.
+Full adapter details, hashes and backend checks are in the
+[technical validation records](docs/research/README.md).
 
 ## Origins and license
 
