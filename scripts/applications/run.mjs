@@ -31,7 +31,14 @@ try {
   window.pipeline=await device.createComputePipelineAsync({layout:'auto',compute:{module,entryPoint:'main'}});
  },shader);
  for(const method of protocol.methods) for(const pair of protocol.seedPairs){
-  const inputs=pair.map(seed=>{const filename=`${method}-${seed}.f32`;const bytes=fs.readFileSync(path.join(input,filename));if(bytes.length!==128*128*32*4)throw Error(filename+' size');report.inputs[filename]=createHash('sha256').update(bytes).digest('hex');return bytes.toString('base64');});
+  const inputs=pair.map(seed=>{
+   const filename=`${method}-${seed}.f32`;const bytes=fs.readFileSync(path.join(input,filename));if(bytes.length!==128*128*32*4)throw Error(filename+' size');
+   const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);const centers=new Float32Array(bytes.length/4);
+   for(let i=0;i<centers.length;i++){const value=view.getFloat32(i*4,true);if(!Number.isFinite(value)||value<0||value>1)throw Error(filename+' invalid value');centers[i]=(Math.min(255,Math.floor(value*256))+.5)/256;}
+   const quantized=Buffer.from(centers.buffer);
+   report.inputs[filename]={sourceSHA256:createHash('sha256').update(bytes).digest('hex'),quantizedSHA256:createHash('sha256').update(quantized).digest('hex')};
+   return quantized.toString('base64');
+  });
   for(let scene=0;scene<protocol.cases.length;scene++){
    const encoded=await page.evaluate(async({inputs,scene})=>{
     const decode=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
