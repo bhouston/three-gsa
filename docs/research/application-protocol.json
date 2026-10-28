@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "frozenBeforeMeasurement": true,
+  "size": 128,
+  "frames": 128,
+  "prefixes": [1, 4, 16, 32, 64, 128],
+  "seedPairs": [[1, 2], [3, 4]],
+  "methods": ["FAST", "GSA"],
+  "cases": ["coverage", "shadow", "ao-wall", "ggx-environment", "camera-shadow", "moving-shadow"],
+  "sampleEncoding": "8-bit bin centers; z,y,x; frame cycle shift (37,71) every 32 frames; independent masks for dimensions",
+  "temporalFilters": ["box", "ema-0.1"],
+  "spatialFilters": ["identity", "binomial-3", "gaussian-sigma1-radius3"],
+  "cameraMotion": "one integer pixel right per frame; exact previous-pixel reprojection; revealed boundary and object-ID changes reset history",
+  "movingBlocker": "blocker center x=0.6*sin(frame*0.08); no perfect-history assumption",
+  "metrics": ["noiseRMSE versus identically filtered analytic truth history", "totalRMSE versus current unfiltered truth", "filterBiasRMSE", "temporalBiasRMSE", "resetPixelRMSE"],
+  "limitations": "Correlated prefixes and filters are diagnostics, not independent trials. Two independent seed pairs, finite geometric scenes, no full renderer/PBR or performance extrapolation. GGX is normal/lobe environment sampling, not a complete BRDF estimator."
+}
